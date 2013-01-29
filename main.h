@@ -78,7 +78,7 @@ void initializeBackground() {
 	}
 }
 
-void initializeConfig(u8 puzzlenr) {
+void initializeConfig(u8 puzzleNumber) {
 	u8 x;
 	u8 config0[30] = {
 		0x09, 0x05, 0x00, 0x00, 0x0C, 0x00,
@@ -109,22 +109,22 @@ void initializeConfig(u8 puzzlenr) {
 		0x05, 0x00, 0x00, 0x10, 0x0A, 0x0C
 	};
 	
-	if (puzzlenr == 0) {
+	if (puzzleNumber == 0) {
 		for (x=0;x<30;x++) {
 			tileConfiguration[x]=config0[x];
 		}
 	}
-	if (puzzlenr == 1) {
+	if (puzzleNumber == 1) {
 		for (x=0;x<30;x++) {
 			tileConfiguration[x]=config1[x];
 		}
 	}
-	if (puzzlenr == 2) {
+	if (puzzleNumber == 2) {
 		for (x=0;x<30;x++) {
 			tileConfiguration[x]=config2[x];
 		}
 	}
-	if (puzzlenr == 3) {
+	if (puzzleNumber == 3) {
 		for (x=0;x<30;x++) {
 			tileConfiguration[x]=config3[x];
 		}
@@ -132,12 +132,12 @@ void initializeConfig(u8 puzzlenr) {
 
 }
 
-u16 getTilePos(u8 tilenr) {
+u16 getTilePos(u8 tileNumber) {
 	u16 y, result;
 	result = 0;
 	
 	for(y=0;y<30;y++) {
-		if ((tileConfiguration[y] & 0x7F) == tilenr) {
+		if ((tileConfiguration[y] & 0x7F) == tileNumber) {
 			result = y;
 		} 
 	}
@@ -164,7 +164,7 @@ u16 getPosY(u16 position) {
 	}
 }
 
-void initializeTiles(u8 puzzlenr) {
+void initializeTiles(u8 puzzleNumber) {
 	u16 x;
 	
 	sprites[0].attribute0 = COLOR_16 | SQUARE | 43;  //set 256 colors, shape and y-coordinate
@@ -178,28 +178,28 @@ void initializeTiles(u8 puzzlenr) {
 	}
 	
 	x = 0;
-	if (puzzlenr == 0) {
+	if (puzzleNumber == 0) {
 		while (x<1294) {
 			lzData[x]=tileset00_data[x*2]+(tileset00_data[x*2+1]<<8);
 			lzData2[x]=pointer_data[x*2]+(pointer_data[x*2+1]<<8);
 			x++;
 		}
 	}
-	if (puzzlenr == 1) {
+	if (puzzleNumber == 1) {
 		while (x<1170) {
 			lzData[x]=tileset01_data[x*2]+(tileset01_data[x*2+1]<<8);
 			lzData2[x]=pointer_data[x*2]+(pointer_data[x*2+1]<<8);
 			x++;
 		}
 	}
-	if (puzzlenr == 2) {
+	if (puzzleNumber == 2) {
 		while (x<1074) {
 			lzData[x]=tileset02_data[x*2]+(tileset02_data[x*2+1]<<8);
 			lzData2[x]=pointer_data[x*2]+(pointer_data[x*2+1]<<8);
 			x++;
 		}
 	}
-	if (puzzlenr == 3) {
+	if (puzzleNumber == 3) {
 		while (x<1034) {
 			lzData[x]=tileset03_data[x*2]+(tileset03_data[x*2+1]<<8);
 			lzData2[x]=pointer_data[x*2]+(pointer_data[x*2+1]<<8);

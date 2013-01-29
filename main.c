@@ -29,11 +29,10 @@ u16 SAVEBGCNT, SAVEDSPCNT;
 u8 DATAX, DATAY;
 u8 CURRENTTILE;
 u16 x;
-u8 nr;
+u8 puzzleNumberToLoad;
 
 #include "gba_oam.h"
 #include "main.h"
-#include "init.h"
 
 int main() {
 	
@@ -48,7 +47,7 @@ int main() {
 	DATAX = 1;
 	DATAY = 1;
 	
-	nr = inputLevel;
+	puzzleNumberToLoad = inputLevel;
 	
 	SAVEBGCNT = REG_BG0CNT;
 	SAVEDSPCNT = REG_DISPCNT;
@@ -74,16 +73,17 @@ int main() {
 	
 	REG_BG0CNT = 0;
 	
-	initializeBackground();
-	initializeSprites();
-	initializeConfig(nr);
-	initializeTiles(nr);
+	initializeBackground(); 		//Load background graphics into VRAM
+	initializeSprites();			//Load sprite graphics into VRAM
+	initializeConfig(puzzleNumberToLoad); 	//Initializes the configuration file depending on which puzzle we wish to load.
+	initializeTiles(puzzleNumberToLoad);  	//Loads the appropriate tile OAMs
 	setTileGFX();
 	
-	REG_BG0CNT = BG_COLOR_16 | TEXTBG_SIZE_256x256 | (8 << SCREEN_SHIFT) | (0 << CHAR_SHIFT) | 3;
+	REG_BG0CNT = BG_COLOR_16 | TEXTBG_SIZE_256x256 | (8 << SCREEN_SHIFT) | (0 << CHAR_SHIFT) | 3; //Set up IO Flags
 	
-	while (!Win()) {
-		SetMode(MODE_1 | BG0_ENABLE | OBJ_ENABLE | OBJ_MAP_1D);
+	while (!Win()) //Our Main Loop
+	{
+		SetMode(MODE_1 | BG0_ENABLE | OBJ_ENABLE | OBJ_MAP_1D); //Set render mode
 		while (MOVEFLAG) {
 			step();
 			vsync();
