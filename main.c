@@ -38,7 +38,7 @@ OAMEntry *sprites = ((OAMEntry *) 0x030022F8);
 
 u16 Win();
 
-u16 main() {
+void main() {
 	CURRENTTILE = 0;
 	STEPS = 0;
 	CARRYFLAG = MOVEFLAG = 0;
@@ -48,10 +48,13 @@ u16 main() {
 	REG_DISPCNT = 0;
 	u32 counter = 0;
 	
-	unfadeScreen();
 	backup();
 	initBG();
 	initConfig(LASTRESULT);
+	
+	unfadeScreen();
+	for(u32 i = 0 ; i < 3 ; i++) vsync();
+	
 	initTiles(LASTRESULT);
 	setTileGFX();
 	initVideo();
@@ -94,10 +97,12 @@ u16 main() {
 	
 	REG_DISPCNT = 0;
 	
-	unfadeScreen();
 	restore();
+	unfadeScreen();
+	for(u32 i = 0 ; i < 4 ; i++) vsync();
 	
-	return 1;
+	BG0CNT      = (31 << SCREEN_SHIFT) | 8;
+	REG_DISPCNT = MODE_0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | OBJ_ENABLE | OBJ_MAP_1D;
 }
 
 #include "include/gba_compress.h"
@@ -158,9 +163,6 @@ void restore() {
 	
 	for(i = 0 ; i < 0x400 ; i++)
 		MenuBG[i] = 0;
-	
-	BG0CNT      = (31 << SCREEN_SHIFT) | 8;
-	REG_DISPCNT = MODE_0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | OBJ_ENABLE | OBJ_MAP_1D;
 }
 
 void initVideo() {
