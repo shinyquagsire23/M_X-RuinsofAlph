@@ -88,7 +88,7 @@ u16 main() {
 		Z(0) = 0;
 		
 		while (ABUTTON && keyDown(KEY_A)); // Ignore A until the player releases it
-		while (!keyDown(KEY_A));           // Wait until the player presses A
+		while (!keyDown(KEY_A) && !keyDown(KEY_B));           // Wait until the player presses A
 		
 		LASTRESULT = 1;
 	}
