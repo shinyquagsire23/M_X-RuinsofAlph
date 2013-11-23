@@ -25,8 +25,9 @@
 #define X(tile) (sprites[tile].attribute1)
 #define Z(tile) (sprites[tile].attribute2)
 
-#define BackupData  ((u16 *) 0x601E000)
-#define BackupData2 ((u16 *) 0x601F000)
+#define BackupData  ((u16 *) 0x601D000)
+#define BackupData2 ((u16 *) 0x601E000)
+#define BackupData3 ((u16 *) 0x601F000)
 
 #define LASTRESULT  (*(u8 *) 0x20375F0)
 
@@ -108,14 +109,17 @@ void backup() {
 	for(i = 0 ; i < 0x1000 ; i++)
 		BackupData[i] = Tiles[i];
 	
-	for(i = 0 ; i < 9 ; i++)
-		BackupData2[i] = OBJ_PaletteMem[i];
+	for(i = 0 ; i < 0x1000 ; i++)
+		BackupData2[i] = MapData[i];
 	
 	for(i = 0 ; i < 9 ; i++)
-		BackupData2[i + 9] = BG_PaletteMem[i];
+		BackupData3[i] = OBJ_PaletteMem[i];
+	
+	for(i = 0 ; i < 9 ; i++)
+		BackupData3[i + 9] = BG_PaletteMem[i];
 	
 	for(i = 0 ; i < 0xC0 * MAXPEOPLE ; i++)
-		BackupData2[i + 18] = OBJData[i];
+		BackupData3[i + 18] = OBJData[i];
 	
 	for(u16 i = 0 ; i < 128 ; i++) {
 		Y(i) = 160;
@@ -136,18 +140,21 @@ void restore() {
 	for(i = 0 ; i < 0x1000 ; i++)
 		Tiles[i] = BackupData[i];
 	
+	for(i = 0 ; i < 0x1000 ; i++)
+		MapData[i] = BackupData2[i];
+	
 	for(i = 0 ; i < 9 ; i++) {
-		OBJ_PaletteMem [i] = BackupData2[i];
-		OBJ_PaletteMem2[i] = BackupData2[i];
+		OBJ_PaletteMem [i] = BackupData3[i];
+		OBJ_PaletteMem2[i] = BackupData3[i];
 	}
 	
 	for(i = 0 ; i < 9 ; i++) {
-		BG_PaletteMem [i] = BackupData2[i + 9];
-		BG_PaletteMem2[i] = BackupData2[i + 9];
+		BG_PaletteMem [i] = BackupData3[i + 9];
+		BG_PaletteMem2[i] = BackupData3[i + 9];
 	}
 	
 	for(i = 0 ; i < 0xC0 * MAXPEOPLE ; i++)
-		OBJData[i] = BackupData2[i + 18];
+		OBJData[i] = BackupData3[i + 18];
 	
 	for(i = 0 ; i < 0x400 ; i++)
 		MenuBG[i] = 0;
