@@ -2,18 +2,6 @@
 #include "background.h"
 #include "tiles.h"
 
-#define GLOBALVARS 0x20370B8
-
-#define MOVEFLAG    (*((u16 *) (GLOBALVARS + 0)))
-#define STEPS       (*((u16 *) (GLOBALVARS + 2)))
-#define CARRYFLAG   (*((u16 *) (GLOBALVARS + 4)))
-#define ABUTTON     (*((u16 *) (GLOBALVARS + 6)))
-#define BBUTTON     (*((u16 *) (GLOBALVARS + 8)))
-#define DATAX       (*((u8  *) (GLOBALVARS + 10)))
-#define DATAY       (*((u8  *) (GLOBALVARS + 11)))
-#define CURRENTTILE (*((u8  *) (GLOBALVARS + 12)))
-#define TILECONFIG  ( ((u8  *) (GLOBALVARS + 13)))
-
 #define Tiles   ((u16 *) 0x6000000)
 #define MapData ((u16 *) 0x6004000)
 #define BG1Data ((u16 *) 0x6008000)
@@ -25,11 +13,24 @@
 #define X(tile) (sprites[tile].attribute1)
 #define Z(tile) (sprites[tile].attribute2)
 
-#define BackupData  ((u16 *) 0x601D000)
-#define BackupData2 ((u16 *) 0x601E000)
-#define BackupData3 ((u16 *) 0x601F000)
+#define BackupData  ((u16 *) 0x2058000)
+#define BackupData2 ((u16 *) 0x2059000)
+#define BackupData3 ((u16 *) 0x2059600)
 
 #define LASTRESULT  (*(u8 *) 0x20375F0)
+
+// 43 bytes for global variables
+#define GLOBALVARS 0x2057600
+
+#define MOVEFLAG    (*((u16 *) (GLOBALVARS + 0)))
+#define STEPS       (*((u16 *) (GLOBALVARS + 2)))
+#define CARRYFLAG   (*((u16 *) (GLOBALVARS + 4)))
+#define ABUTTON     (*((u16 *) (GLOBALVARS + 6)))
+#define BBUTTON     (*((u16 *) (GLOBALVARS + 8)))
+#define DATAX       (*((u8  *) (GLOBALVARS + 10)))
+#define DATAY       (*((u8  *) (GLOBALVARS + 11)))
+#define CURRENTTILE (*((u8  *) (GLOBALVARS + 12)))
+#define TILECONFIG  ( ((u8  *) (GLOBALVARS + 13)))
 
 #define MAXPEOPLE 3
 
@@ -109,7 +110,7 @@ void backup() {
 	for(i = 0 ; i < 0x1000 ; i++)
 		BackupData[i] = Tiles[i];
 	
-	for(i = 0 ; i < 0x1000 ; i++)
+	for(i = 0 ; i < 0x300 ; i++)
 		BackupData2[i] = MapData[i];
 	
 	for(i = 0 ; i < 9 ; i++)
@@ -140,7 +141,7 @@ void restore() {
 	for(i = 0 ; i < 0x1000 ; i++)
 		Tiles[i] = BackupData[i];
 	
-	for(i = 0 ; i < 0x1000 ; i++)
+	for(i = 0 ; i < 0x300 ; i++)
 		MapData[i] = BackupData2[i];
 	
 	for(i = 0 ; i < 9 ; i++) {
