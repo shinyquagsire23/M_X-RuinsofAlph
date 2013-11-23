@@ -48,8 +48,7 @@ u16 main() {
 	REG_DISPCNT = 0;
 	u32 counter = 0;
 	
-	// unfadeScreen();
-	
+	unfadeScreen();
 	backup();
 	initBG();
 	initConfig(LASTRESULT);
@@ -95,7 +94,7 @@ u16 main() {
 	
 	REG_DISPCNT = 0;
 	
-	// unfadeScreen();
+	unfadeScreen();
 	restore();
 	
 	return 1;

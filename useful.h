@@ -16,8 +16,10 @@ void fadeScreen()
 
 void fadeScreen2(int white, int r2, int r3)
 {
+	__asm__("push {r0-r7}");
 	int (*func)(void) = (int (*)(void))0x08AEFC11;
 	func();
+	__asm__("pop {r0-r7}");
 }
 
 void fadeScreenFast()
