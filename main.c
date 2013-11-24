@@ -34,6 +34,14 @@
 
 #define MAXPEOPLE 3
 
+#define EMPTYMOVESOUND 0x05
+#define TILEMOVESOUND  0x23
+#define ERRORSOUND     0x20
+#define TAKETILESOUND  0x24
+#define DROPTILESOUND  0x2C
+#define EXITSOUND      0x05
+#define WINSONG        0x186
+
 OAMEntry *sprites = ((OAMEntry *) 0x030022F8);
 
 u16 Win();
@@ -53,7 +61,7 @@ void main() {
 	initConfig(LASTRESULT);
 	
 	unfadeScreen();
-	for(u32 i = 0 ; i < 3 ; i++) vsync();
+	vsync();
 	
 	initTiles(LASTRESULT);
 	setTileGFX();
@@ -61,9 +69,6 @@ void main() {
 	
 	// Our Main Loop
 	while (!Win()) {
-		getKeyInput();
-		pixieDust();
-		
 		if(!CARRYFLAG) {
 			if(counter < 5000) {
 				counter++;
@@ -80,26 +85,45 @@ void main() {
 			LASTRESULT = 0;
 			break;
 		}
+		
+		pixieDust();
+		getKeyInput();
 	}
-	
-	pixieDust();
 	
 	if(!BBUTTON) {
 		Y(0) = 160;
 		X(0) = 240;
 		Z(0) = 0;
 		
-		while (ABUTTON && keyDown(KEY_A)); // Ignore A until the player releases it
-		while (!keyDown(KEY_A) && !keyDown(KEY_B));           // Wait until the player presses A
+		while (ABUTTON && keyDown(KEY_A));          // Ignore A until the player releases it
+		while (!keyDown(KEY_A) && !keyDown(KEY_B)); // Wait until the player presses A or B
 		
 		LASTRESULT = 1;
 	}
+	
+	for(u8 i = 0 ; i < 9 ; i++) {
+		BG_PaletteMem  [i] = background_Palette_dark[i];
+		BG_PaletteMem2 [i] = background_Palette_dark[i];
+		OBJ_PaletteMem [i] = tiles_palette_dark[i];
+		OBJ_PaletteMem2[i] = tiles_palette_dark[i];
+	}
+	
+	for(u32 i = 0; i < 30000 ; i++);
+	
+	for(u8 i = 0 ; i < 9 ; i++) {
+		BG_PaletteMem  [i] = background_Palette_darker[i];
+		BG_PaletteMem2 [i] = background_Palette_darker[i];
+		OBJ_PaletteMem [i] = tiles_palette_darker[i];
+		OBJ_PaletteMem2[i] = tiles_palette_darker[i];
+	}
+	
+	for(u32 i = 0; i < 30000 ; i++);
 	
 	REG_DISPCNT = 0;
 	
 	restore();
 	unfadeScreen();
-	for(u32 i = 0 ; i < 4 ; i++) vsync();
+	for(u32 i = 0 ; i < 3 ; i++) vsync();
 	
 	BG0CNT      = (31 << SCREEN_SHIFT) | 8;
 	REG_DISPCNT = MODE_0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | OBJ_ENABLE | OBJ_MAP_1D;
@@ -174,7 +198,7 @@ void initBG() {
 	u16 x = 651, y = 611;
 	
 	for(u16 i = 0 ; i < 9 ; i++)
-		BG_PaletteMem[i] = BG_PaletteMem2[i] = background_Palette_diff[i];
+		BG_PaletteMem[i] = BG_PaletteMem2[i] = background_Palette[i];
 	
 	LZ77UnCompVram(background_Tiles, Tiles);
 	LZ77UnCompVram(background_Map,   MapData);
@@ -300,9 +324,14 @@ void setTileGFX() {
 	}
 }
 
-void getKeyInput() {	
-	if keyDown(KEY_RIGHT) {
-		if (DATAX < 5) {				
+void getKeyInput() {
+	if(keyDown(KEY_RIGHT)) {
+		if (DATAX < 5) {
+			if(CARRYFLAG)
+				playSound(TILEMOVESOUND);
+			else
+				playSound(EMPTYMOVESOUND);
+			
 			X(CURRENTTILE) -= coordsX[DATAY*6+DATAX];
 			
 			if(CURRENTTILE != 0)
@@ -317,9 +346,13 @@ void getKeyInput() {
 		}
 		
 		while(keyDown(KEY_RIGHT));
-	}
-	if keyDown(KEY_LEFT) {
+	} else if(keyDown(KEY_LEFT)) {
 		if (DATAX > 0) {
+			if(CARRYFLAG)
+				playSound(TILEMOVESOUND);
+			else
+				playSound(EMPTYMOVESOUND);
+			
 			X(CURRENTTILE) -= coordsX[DATAY*6+DATAX];
 			
 			if(CURRENTTILE != 0)
@@ -334,9 +367,13 @@ void getKeyInput() {
 		}
 		
 		while(keyDown(KEY_LEFT));
-	}
-	if keyDown(KEY_DOWN) {
+	} else if(keyDown(KEY_DOWN)) {
 		if (DATAY < 4) {
+			if(CARRYFLAG)
+				playSound(TILEMOVESOUND);
+			else
+				playSound(EMPTYMOVESOUND);
+			
 			Y(CURRENTTILE) -= coordsY[DATAY*6+DATAX];
 			
 			if(CURRENTTILE != 0)
@@ -351,9 +388,13 @@ void getKeyInput() {
 		}
 		
 		while(keyDown(KEY_DOWN));
-	}
-	if keyDown(KEY_UP) {
+	} else if(keyDown(KEY_UP)) {
 		if (DATAY > 0) {
+			if(CARRYFLAG)
+				playSound(TILEMOVESOUND);
+			else
+				playSound(EMPTYMOVESOUND);
+			
 			Y(CURRENTTILE) -= coordsY[DATAY*6+DATAX];
 			
 			if(CURRENTTILE != 0)
@@ -368,29 +409,31 @@ void getKeyInput() {
 		}
 		
 		while(keyDown(KEY_UP));
-	}
-	
-	if keyDown(KEY_A) {
+	} else if(keyDown(KEY_A)) {
 		if (!ABUTTON) {
 			if (CARRYFLAG) {
 				if (TILECONFIG[DATAY*6+DATAX] == 0) {
+					playSound(DROPTILESOUND);
 					TILECONFIG[DATAY*6+DATAX] = CURRENTTILE;
 					sprites[CURRENTTILE].attribute2 = PRIORITY(1) | (sprites[CURRENTTILE].attribute2 & 0x3FF);
 					CURRENTTILE = 0;
 					CARRYFLAG = 0;
 					ABUTTON = 1;
 					Z(0) = PRIORITY(0) | 512;
-				}
+				} else
+					playSound(ERRORSOUND);
 			}
 			else {
 				if (TILECONFIG[DATAY*6+DATAX] != 0) {
+					playSound(TAKETILESOUND);
 					CURRENTTILE = TILECONFIG[DATAY*6+DATAX];
 					TILECONFIG[DATAY*6+DATAX] = 0;
 					CARRYFLAG = 1;
 					sprites[CURRENTTILE].attribute2 = PRIORITY(0) | (sprites[CURRENTTILE].attribute2 & 0x3FF);
 					ABUTTON = 1;
 					Z(0) = PRIORITY(3) | 512;
-				}
+				} else
+					playSound(ERRORSOUND);
 			}
 		}
 	}
@@ -398,8 +441,10 @@ void getKeyInput() {
 	if (!keyDown(KEY_A))
 		ABUTTON = 0;
 	
-	if keyDown(KEY_B)
+	if(keyDown(KEY_B)) {
+		playSound(EXITSOUND);
 		BBUTTON = 1;
+	}
 }
 
 u16 Win() {
@@ -414,6 +459,7 @@ u16 Win() {
 	for(u8 i = 0 ; i < 30 ; i++)
 		if(TILECONFIG[i] != win[i])
 			return 0;
-		
+	
+	playSong(WINSONG);
 	return 1;
 }
