@@ -9,28 +9,27 @@
 #define OBJData ((u16 *) 0x6010000)
 #define MenuBG  ((u16 *) 0x600F800)
 
-#define Y(tile) (sprites[tile].attribute0)
-#define X(tile) (sprites[tile].attribute1)
-#define Z(tile) (sprites[tile].attribute2)
+#define objYHeight(tile) (sprites[tile].attribute0)
+#define objXSize(tile) (sprites[tile].attribute1)
+#define objPalTile(tile) (sprites[tile].attribute2)
 
-#define BackupData  ((u16 *) 0x2058000)
-#define BackupData2 ((u16 *) 0x2059000)
-#define BackupData3 ((u16 *) 0x2059600)
+#define LASTRESULT		(*(u16 *) 0x20375F0)
+#define var8004			(*(u16 *) 0x20375E0)
+#define fadeScreenDone	(*(u8 *) 0x02037FDB)
 
-#define LASTRESULT  (*(u8 *) 0x20375F0)
-
-// 43 bytes for global variables
-#define GLOBALVARS 0x2057600
-
-#define MOVEFLAG    (*((u16 *) (GLOBALVARS + 0)))
-#define STEPS       (*((u16 *) (GLOBALVARS + 2)))
-#define CARRYFLAG   (*((u16 *) (GLOBALVARS + 4)))
-#define ABUTTON     (*((u16 *) (GLOBALVARS + 6)))
-#define BBUTTON     (*((u16 *) (GLOBALVARS + 8)))
-#define DATAX       (*((u8  *) (GLOBALVARS + 10)))
-#define DATAY       (*((u8  *) (GLOBALVARS + 11)))
-#define CURRENTTILE (*((u8  *) (GLOBALVARS + 12)))
-#define TILECONFIG  ( ((u8  *) (GLOBALVARS + 13)))
+#define TMPSTRPTRADDR	((u32 *) 0x0203BCD0)
+#define globalVars		(*((u32 *) TMPSTRPTRADDR))
+#define counter			(*(u32 *) (globalVars + 0))
+#define moveFlag		(*(u16 *) (globalVars + 4))
+#define steps			(*(u16 *) (globalVars + 6))
+#define carryFlag		(*(u16 *) (globalVars + 8))
+#define AButton			(*(u16 *) (globalVars + 10))
+#define BButton			(*(u16 *) (globalVars + 12))
+#define dataX			(*(u8  *) (globalVars + 14))
+#define dataY			(*(u8  *) (globalVars + 15))
+#define currentTile		(*(u8  *) (globalVars + 16))
+#define currentLoop		(*(u8  *) (globalVars + 17))
+#define tileConfig		((u8  *) (globalVars + 18))
 
 #define MAXPEOPLE 3
 
@@ -39,166 +38,130 @@
 #define ERRORSOUND     0x20
 #define TAKETILESOUND  0x24
 #define DROPTILESOUND  0x2C
-#define EXITSOUND      0x05
 #define WINSONG        0x186
 
 OAMEntry *sprites = ((OAMEntry *) 0x030022F8);
 
 u16 Win();
+void init2();
+void init3();
+void main();
+void updateEverything2();
 
-void main() {
-	CURRENTTILE = 0;
-	STEPS = 0;
-	CARRYFLAG = MOVEFLAG = 0;
-	DATAX = DATAY = 1;
-	ABUTTON = 1;
-	BBUTTON = 0;
-	REG_DISPCNT = 0;
-	u32 counter = 0;
+void init() {
+
+	storeCallback((void *) init2 + 1);
 	
-	backup();
+}
+
+void init2() {
+
+	storeCallback2(0);
+
+	int (*func)(u32) = (int (*)(u32))0x08000B39;
+	globalVars = func(0x30);
+
+	currentTile = 0;
+	steps = 0;
+	carryFlag = moveFlag = 0;
+	dataX = dataY = 1;
+	AButton = 1;
+	BButton = 0;
+	counter = 0;
+	currentLoop = 0;
+
 	initBG();
-	initConfig(LASTRESULT);
-	
-	unfadeScreen();
+	initConfig(var8004);
+
 	vsync();
-	
-	initTiles(LASTRESULT);
-	setTileGFX();
+
+	initTiles(var8004);
+	setTileGFobjXSize();
 	initVideo();
+	unfadeScreen();
 	
-	// Our Main Loop
-	while (!Win()) {
-		if(!CARRYFLAG) {
-			if(counter < 5000) {
-				counter++;
-				Z(0) = PRIORITY(0) | 256;
-			} else if(counter < 10000) {
-				counter++;
-				Z(0) = PRIORITY(0) | 512;
+	storeCallback((void *) main + 1);
+	storeCallback2((void *) updateEverything2 + 1);
+}
+
+void init3() {
+	for(int i=0x10;i<0x20;i+=2) changeIO(i,0);
+	
+	clearOAM();
+	
+}
+
+void main() {	// The main loop
+
+	if (currentLoop == 0) {
+		if (fadeScreenDone == 0)
+			currentLoop++;
+	}
+	
+	else if (currentLoop == 1) {
+		if (!Win()) {
+			if(!carryFlag) {
+				if(counter < 5000) {
+					counter++;
+					objPalTile(0) = PRIORITY(0) | 256;
+				} else if(counter < 10000) {
+					counter++;
+					objPalTile(0) = PRIORITY(0) | 512;
+				} else
+					counter = 0;
 			} else
 				counter = 0;
-		} else
-			counter = 0;
-		
-		if (BBUTTON) {
-			LASTRESULT = 0;
-			break;
+			
+			if (BButton) {
+				LASTRESULT = 0;
+				fadeScreen();
+				currentLoop++;
+			}
+			
+			getKeyInput();
 		}
 		
-		pixieDust();
-		getKeyInput();
+		else {
+			objYHeight(0) = 160;
+			objXSize(0) = 240;
+			objPalTile(0) = 0;
+			
+			while (AButton && keyDown(KEY_A));          // Ignore A until the player releases it
+			while (!keyDown(KEY_A) && !keyDown(KEY_B)); // Wait until the player presses A or B
+			
+			LASTRESULT = 1;
+			fadeScreen();
+			currentLoop++;
+		}
 	}
 	
-	if(!BBUTTON) {
-		Y(0) = 160;
-		X(0) = 240;
-		Z(0) = 0;
-		
-		while (ABUTTON && keyDown(KEY_A));          // Ignore A until the player releases it
-		while (!keyDown(KEY_A) && !keyDown(KEY_B)); // Wait until the player presses A or B
-		
-		LASTRESULT = 1;
+	else if (currentLoop == 2) {
+		if (fadeScreenDone == 0)
+			storeCallback(0x080861CD);
 	}
 	
-	for(u8 i = 0 ; i < 9 ; i++) {
-		BG_PaletteMem  [i] = background_Palette_dark[i];
-		BG_PaletteMem2 [i] = background_Palette_dark[i];
-		OBJ_PaletteMem [i] = tiles_palette_dark[i];
-		OBJ_PaletteMem2[i] = tiles_palette_dark[i];
-	}
-	
-	for(u32 i = 0; i < 30000 ; i++);
-	
-	for(u8 i = 0 ; i < 9 ; i++) {
-		BG_PaletteMem  [i] = background_Palette_darker[i];
-		BG_PaletteMem2 [i] = background_Palette_darker[i];
-		OBJ_PaletteMem [i] = tiles_palette_darker[i];
-		OBJ_PaletteMem2[i] = tiles_palette_darker[i];
-	}
-	
-	for(u32 i = 0; i < 30000 ; i++);
-	
-	REG_DISPCNT = 0;
-	
-	restore();
-	unfadeScreen();
-	for(u32 i = 0 ; i < 3 ; i++) vsync();
-	
-	BG0CNT      = (31 << SCREEN_SHIFT) | 8;
-	REG_DISPCNT = MODE_0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | OBJ_ENABLE | OBJ_MAP_1D;
+	updateEverything();
+
 }
 
 #include "include/gba_compress.h"
 #include "useful.h"
 
-void backup() {
-	u16 i;
-	
-	for(i = 0 ; i < 0x1000 ; i++)
-		BackupData[i] = Tiles[i];
-	
-	for(i = 0 ; i < 0x300 ; i++)
-		BackupData2[i] = MapData[i];
-	
-	for(i = 0 ; i < 9 ; i++)
-		BackupData3[i] = OBJ_PaletteMem[i];
-	
-	for(i = 0 ; i < 9 ; i++)
-		BackupData3[i + 9] = BG_PaletteMem[i];
-	
-	for(i = 0 ; i < 0xC0 * MAXPEOPLE ; i++)
-		BackupData3[i + 18] = OBJData[i];
-	
-	for(u16 i = 0 ; i < 128 ; i++) {
-		Y(i) = 160;
-		X(i) = 240;
-		Z(i) = 0;
-	}
-}
-
-void restore() {
-	u16 i;
-	
-	for(u8 i = 0 ; i <= 16 ; i++) {
-		Y(i) = 160;
-		X(i) = 240;
-		Z(i) = 0;
-	}
-	
-	for(i = 0 ; i < 0x1000 ; i++)
-		Tiles[i] = BackupData[i];
-	
-	for(i = 0 ; i < 0x300 ; i++)
-		MapData[i] = BackupData2[i];
-	
-	for(i = 0 ; i < 9 ; i++) {
-		OBJ_PaletteMem [i] = BackupData3[i];
-		OBJ_PaletteMem2[i] = BackupData3[i];
-	}
-	
-	for(i = 0 ; i < 9 ; i++) {
-		BG_PaletteMem [i] = BackupData3[i + 9];
-		BG_PaletteMem2[i] = BackupData3[i + 9];
-	}
-	
-	for(i = 0 ; i < 0xC0 * MAXPEOPLE ; i++)
-		OBJData[i] = BackupData3[i + 18];
-	
-	for(i = 0 ; i < 0x400 ; i++)
-		MenuBG[i] = 0;
-}
-
 void initVideo() {
-	REG_DISPCNT = MODE_0 | BG0_ENABLE | OBJ_ENABLE | OBJ_MAP_1D;
-	BG0CNT      = (8 << SCREEN_SHIFT) | 3;
+
+	changeIO(0,MODE_0 | OBJ_ENABLE | OBJ_MAP_1D);
+	
+	enableBG(0);
+	
+	changeIO(8,(8 << SCREEN_SHIFT) | 3);
+	
 }
 
 void initBG() {
 	u16 x = 651, y = 611;
 	
 	for(u16 i = 0 ; i < 9 ; i++)
-		BG_PaletteMem[i] = BG_PaletteMem2[i] = background_Palette[i];
+		BG_PaletteMem[i] = background_Palette[i];
 	
 	LZ77UnCompVram(background_Tiles, Tiles);
 	LZ77UnCompVram(background_Map,   MapData);
@@ -260,23 +223,22 @@ void initConfig(u8 puzzleNumber) {
 	};
 	
 	if(puzzleNumber == 0)
-		memcpy(TILECONFIG, config0, 30);
+		memcpy(tileConfig, config0, 30);
 	else if(puzzleNumber == 1)
-		memcpy(TILECONFIG, config1, 30);
+		memcpy(tileConfig, config1, 30);
 	else if(puzzleNumber == 2)
-		memcpy(TILECONFIG, config2, 30);
+		memcpy(tileConfig, config2, 30);
 	else
-		memcpy(TILECONFIG, config3, 30);
+		memcpy(tileConfig, config3, 30);
 }
 
 void initTiles(u8 puzzleNumber) {
-	Y(0) = 55;                //set y-coordinate
-	X(0) = SIZE_32 | 71;      //set size and x-coordinate
-	Z(0) = PRIORITY(0) | 512; //where in VRAM we get the tile data from
+	objYHeight(0) = 55;                //set y-coordinate
+	objXSize(0) = SIZE_32 | 71;      //set size and x-coordinate
+	objPalTile(0) = PRIORITY(0) | 512; //where in VRAM we get the tile data from
 	
 	for(u8 i = 0 ; i < 9 ; i++) {
 		OBJ_PaletteMem [i] = tiles_palette[i];
-		OBJ_PaletteMem2[i] = tiles_palette[i];
 	}
 	
 	if(puzzleNumber == 0)
@@ -309,129 +271,130 @@ const u8 coordsY[30] = {
 
 u16 getTilePos(u8 tileNumber) {
 	for(u32 i = 0 ; i < 30 ; i++)
-		if((TILECONFIG[i] & 0x7F) == tileNumber)
+		if((tileConfig[i] & 0x7F) == tileNumber)
 			return i;
 	
 	return 0;
 }
 
-void setTileGFX() {
+void setTileGFobjXSize() {
 	for(u8 i = 1 ; i <= 16 ; i++) {
 		u16 position = getTilePos(i);
-		Y(i) = coordsY[position];
-		X(i) = SIZE_32 | coordsX[position];
-		Z(i) = PRIORITY(1) | (i - 1) * 16;
+		objYHeight(i) = coordsY[position];
+		objXSize(i) = SIZE_32 | coordsX[position];
+		objPalTile(i) = PRIORITY(1) | (i - 1) * 16;
 	}
 }
 
 void getKeyInput() {
 	if(keyDown(KEY_RIGHT)) {
-		if (DATAX < 5) {
-			if(CARRYFLAG)
+		if (dataX < 5) {
+			if(carryFlag)
 				playSound(TILEMOVESOUND);
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			X(CURRENTTILE) -= coordsX[DATAY*6+DATAX];
+			objXSize(currentTile) -= coordsX[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				X(0) -= coordsX[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objXSize(0) -= coordsX[dataY*6+dataX];
 			
-			DATAX++;
+			dataX++;
 			
-			X(CURRENTTILE) += coordsX[DATAY*6+DATAX];
+			objXSize(currentTile) += coordsX[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				X(0) += coordsX[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objXSize(0) += coordsX[dataY*6+dataX];
 		}
 		
 		while(keyDown(KEY_RIGHT));
 	} else if(keyDown(KEY_LEFT)) {
-		if (DATAX > 0) {
-			if(CARRYFLAG)
+		if (dataX > 0) {
+			if(carryFlag)
 				playSound(TILEMOVESOUND);
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			X(CURRENTTILE) -= coordsX[DATAY*6+DATAX];
+			objXSize(currentTile) -= coordsX[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				X(0) -= coordsX[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objXSize(0) -= coordsX[dataY*6+dataX];
 			
-			DATAX--;
+			dataX--;
 			
-			X(CURRENTTILE) += coordsX[DATAY*6+DATAX];
+			objXSize(currentTile) += coordsX[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				X(0) += coordsX[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objXSize(0) += coordsX[dataY*6+dataX];
 		}
 		
 		while(keyDown(KEY_LEFT));
 	} else if(keyDown(KEY_DOWN)) {
-		if (DATAY < 4) {
-			if(CARRYFLAG)
+		if (dataY < 4) {
+			if(carryFlag)
 				playSound(TILEMOVESOUND);
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			Y(CURRENTTILE) -= coordsY[DATAY*6+DATAX];
+			objYHeight(currentTile) -= coordsY[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				Y(0) -= coordsY[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objYHeight(0) -= coordsY[dataY*6+dataX];
 			
-			DATAY++;
+			dataY++;
 			
-			if(CURRENTTILE != 0)
-				Y(CURRENTTILE) += coordsY[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objYHeight(currentTile) += coordsY[dataY*6+dataX];
 			
-			Y(0) += coordsY[DATAY*6+DATAX];
+			objYHeight(0) += coordsY[dataY*6+dataX];
 		}
 		
 		while(keyDown(KEY_DOWN));
 	} else if(keyDown(KEY_UP)) {
-		if (DATAY > 0) {
-			if(CARRYFLAG)
+		if (dataY > 0) {
+			if(carryFlag)
 				playSound(TILEMOVESOUND);
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			Y(CURRENTTILE) -= coordsY[DATAY*6+DATAX];
+			objYHeight(currentTile) -= coordsY[dataY*6+dataX];
 			
-			if(CURRENTTILE != 0)
-				Y(0) -= coordsY[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objYHeight(0) -= coordsY[dataY*6+dataX];
 			
-			DATAY--;
+			dataY--;
 			
-			if(CURRENTTILE != 0)
-				Y(CURRENTTILE) += coordsY[DATAY*6+DATAX];
+			if(currentTile != 0)
+				objYHeight(currentTile) += coordsY[dataY*6+dataX];
 			
-			Y(0) += coordsY[DATAY*6+DATAX];
+			objYHeight(0) += coordsY[dataY*6+dataX];
 		}
 		
 		while(keyDown(KEY_UP));
 	} else if(keyDown(KEY_A)) {
-		if (!ABUTTON) {
-			if (CARRYFLAG) {
-				if (TILECONFIG[DATAY*6+DATAX] == 0) {
+		if (!AButton) {
+			if (carryFlag) {
+				AButton = 1;
+				if (tileConfig[dataY*6+dataX] == 0) {
 					playSound(DROPTILESOUND);
-					TILECONFIG[DATAY*6+DATAX] = CURRENTTILE;
-					sprites[CURRENTTILE].attribute2 = PRIORITY(1) | (sprites[CURRENTTILE].attribute2 & 0x3FF);
-					CURRENTTILE = 0;
-					CARRYFLAG = 0;
-					ABUTTON = 1;
-					Z(0) = PRIORITY(0) | 512;
+					tileConfig[dataY*6+dataX] = currentTile;
+					sprites[currentTile].attribute2 = PRIORITY(1) | (sprites[currentTile].attribute2 & 0x3FF);
+					currentTile = 0;
+					carryFlag = 0;
+					objPalTile(0) = PRIORITY(0) | 512;
 				} else
 					playSound(ERRORSOUND);
 			}
 			else {
-				if (TILECONFIG[DATAY*6+DATAX] != 0) {
+				AButton = 1;
+				if (tileConfig[dataY*6+dataX] != 0) {
 					playSound(TAKETILESOUND);
-					CURRENTTILE = TILECONFIG[DATAY*6+DATAX];
-					TILECONFIG[DATAY*6+DATAX] = 0;
-					CARRYFLAG = 1;
-					sprites[CURRENTTILE].attribute2 = PRIORITY(0) | (sprites[CURRENTTILE].attribute2 & 0x3FF);
-					ABUTTON = 1;
-					Z(0) = PRIORITY(3) | 512;
+					currentTile = tileConfig[dataY*6+dataX];
+					tileConfig[dataY*6+dataX] = 0;
+					carryFlag = 1;
+					sprites[currentTile].attribute2 = PRIORITY(0) | (sprites[currentTile].attribute2 & 0x3FF);
+					AButton = 1;
+					objPalTile(0) = PRIORITY(3) | 512;
 				} else
 					playSound(ERRORSOUND);
 			}
@@ -439,11 +402,10 @@ void getKeyInput() {
 	}
 	
 	if (!keyDown(KEY_A))
-		ABUTTON = 0;
+		AButton = 0;
 	
 	if(keyDown(KEY_B)) {
-		playSound(EXITSOUND);
-		BBUTTON = 1;
+		BButton = 1;
 	}
 }
 
@@ -457,7 +419,7 @@ u16 Win() {
 	};
 	
 	for(u8 i = 0 ; i < 30 ; i++)
-		if(TILECONFIG[i] != win[i])
+		if(tileConfig[i] != win[i])
 			return 0;
 	
 	playSong(WINSONG);
