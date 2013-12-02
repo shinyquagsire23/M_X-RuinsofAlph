@@ -68,56 +68,50 @@ void copyMem(void *source, void *dest, void *size)
 
 void playFanfare(int *fanfareNum)
 {
-	int (*func)(void) = (int (*)(void))0x082E0131;
-	int x = func();
-}
-
-void playCry(int *pkmnNum, int *fx)
-{
-	int (*func)(void) = (int (*)(void))0x080A3275;
-	int x = func();
+	int (*func)(void) = (int (*)(void))0x080A30E5;
+	func();
 }
 
 void playSound(int *fxNum)
 {
 	int (*func)(void) = (int (*)(void))0x080A37A5;
-	int x = func();
+	func();
 }
 
 void changeIO(int *offset, int *value)
 {
 	int (*func)(void) = (int (*)(void))0x080010B5;
-	int i = func();
+	func();
 }
 
 void enableBG(int *BG)
 {
 	int (*func)(void) = (int (*)(void))0x08001B31;
-	int i = func();
+	func();
 }
 
 void clearOAM()
 {
 	int (*func)(void) = (int (*)(void))0x08006975;
-	int i = func();
+	func();
 	
 	int (*func2)(void) = (int (*)(void))0x0800870D;
-	int i2 = func2();
+	func2();
 	
 	asm("mov r0, #0x0");
 	int (*func3)(void) = (int (*)(void))0x080017BD;
-	int i3 = func3();
+	func3();
 	
 }
 
 void storeCallback(int *addr)
 {
 	int (*func)(void) = (int (*)(void))0x08000541;
-	int x = func();
+	func();
 }	
 
 void storeCallback2(int *addr)
 {	
 	int (*func)(void) = (int (*)(void))0x080006F1;
-	int x = func();
+	func();
 }

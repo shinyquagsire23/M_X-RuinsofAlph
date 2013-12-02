@@ -19,17 +19,15 @@
 
 #define TMPSTRPTRADDR	((u32 *) 0x0203BCD0)
 #define globalVars		(*((u32 *) TMPSTRPTRADDR))
-#define counter			(*(u32 *) (globalVars + 0))
-#define moveFlag		(*(u16 *) (globalVars + 4))
-#define steps			(*(u16 *) (globalVars + 6))
-#define carryFlag		(*(u16 *) (globalVars + 8))
-#define AButton			(*(u16 *) (globalVars + 10))
-#define BButton			(*(u16 *) (globalVars + 12))
-#define dataX			(*(u8  *) (globalVars + 14))
-#define dataY			(*(u8  *) (globalVars + 15))
-#define currentTile		(*(u8  *) (globalVars + 16))
-#define currentLoop		(*(u8  *) (globalVars + 17))
-#define tileConfig		((u8  *) (globalVars + 18))
+#define counter			(*(u32 *) (globalVars + 0x0))
+#define moveFlag		(*(u16 *) (globalVars + 0x4))
+#define steps			(*(u16 *) (globalVars + 0x6))
+#define carryFlag		(*(u16 *) (globalVars + 0x8))
+#define dataX			(*(u8  *) (globalVars + 0xA))
+#define dataY			(*(u8  *) (globalVars + 0xB))
+#define currentTile		(*(u8  *) (globalVars + 0xC))
+#define currentLoop		(*(u8  *) (globalVars + 0xD))
+#define tileConfig		((u8  *) (globalVars + 0xE))	// Size of 0x1E
 
 #define MAXPEOPLE 3
 
@@ -59,29 +57,11 @@ void init2() {
 	storeCallback2(0);
 
 	int (*func)(u32) = (int (*)(u32))0x08000B39;
-	globalVars = func(0x30);
-
-	currentTile = 0;
-	steps = 0;
-	carryFlag = moveFlag = 0;
-	dataX = dataY = 1;
-	AButton = 1;
-	BButton = 0;
-	counter = 0;
+	globalVars = func(0x2C);
 	currentLoop = 0;
-
-	initBG();
-	initConfig(var8004);
-
-	vsync();
-
-	initTiles(var8004);
-	setTileGFobjXSize();
-	initVideo();
-	unfadeScreen();
 	
-	storeCallback((void *) main + 1);
-	storeCallback2((void *) updateEverything2 + 1);
+	storeCallback((void *) init3 + 1);
+	
 }
 
 void init3() {
@@ -89,16 +69,40 @@ void init3() {
 	
 	clearOAM();
 	
+	storeCallback((void *) main + 1);
+	storeCallback2((void *) updateEverything2 + 1);
+	
 }
 
 void main() {	// The main loop
 
 	if (currentLoop == 0) {
+		currentTile = 0;
+		steps = 0;
+		carryFlag = moveFlag = 0;
+		dataX = dataY = 1;
+		counter = 0;
+		currentLoop = 0;
+
+		initBG();
+		initConfig(var8004);
+
+		vsync();
+
+		initTiles(var8004);
+		setTileGFobjXSize();
+		initVideo();
+		unfadeScreen();
+		currentLoop++;
+	
+	}
+	
+	else if (currentLoop == 1) {
 		if (fadeScreenDone == 0)
 			currentLoop++;
 	}
 	
-	else if (currentLoop == 1) {
+	else if (currentLoop == 2) {
 		if (!Win()) {
 			if(!carryFlag) {
 				if(counter < 5000) {
@@ -112,10 +116,10 @@ void main() {	// The main loop
 			} else
 				counter = 0;
 			
-			if (BButton) {
+			if (keyPressed(KEY_B)) {
 				LASTRESULT = 0;
 				fadeScreen();
-				currentLoop++;
+				currentLoop = 4;
 			}
 			
 			getKeyInput();
@@ -126,16 +130,25 @@ void main() {	// The main loop
 			objXSize(0) = 240;
 			objPalTile(0) = 0;
 			
-			while (AButton && keyDown(KEY_A));          // Ignore A until the player releases it
-			while (!keyDown(KEY_A) && !keyDown(KEY_B)); // Wait until the player presses A or B
-			
-			LASTRESULT = 1;
-			fadeScreen();
+			playFanfare(WINSONG);
 			currentLoop++;
 		}
 	}
 	
-	else if (currentLoop == 2) {
+	else if (currentLoop == 3) {
+	
+		int (*func)(void) = (int (*)(u8))0x080A3121;
+		
+		if (func() == 1) {                                       // Ignore A or B until the fanfare is done
+			if (keyPressed(KEY_A) || keyPressed(KEY_B)) {   // Wait until the player presses A or B
+				LASTRESULT = 1;
+				fadeScreen();
+				currentLoop++;
+			}
+		}
+	}
+	
+	else if (currentLoop == 4) {
 		if (fadeScreenDone == 0)
 			storeCallback(0x080861CD);
 	}
@@ -287,7 +300,7 @@ void setTileGFobjXSize() {
 }
 
 void getKeyInput() {
-	if(keyDown(KEY_RIGHT)) {
+	if(keyPressed(KEY_RIGHT)) {
 		if (dataX < 5) {
 			if(carryFlag)
 				playSound(TILEMOVESOUND);
@@ -307,8 +320,7 @@ void getKeyInput() {
 				objXSize(0) += coordsX[dataY*6+dataX];
 		}
 		
-		while(keyDown(KEY_RIGHT));
-	} else if(keyDown(KEY_LEFT)) {
+	} else if(keyPressed(KEY_LEFT)) {
 		if (dataX > 0) {
 			if(carryFlag)
 				playSound(TILEMOVESOUND);
@@ -328,8 +340,7 @@ void getKeyInput() {
 				objXSize(0) += coordsX[dataY*6+dataX];
 		}
 		
-		while(keyDown(KEY_LEFT));
-	} else if(keyDown(KEY_DOWN)) {
+	} else if(keyPressed(KEY_DOWN)) {
 		if (dataY < 4) {
 			if(carryFlag)
 				playSound(TILEMOVESOUND);
@@ -349,8 +360,7 @@ void getKeyInput() {
 			objYHeight(0) += coordsY[dataY*6+dataX];
 		}
 		
-		while(keyDown(KEY_DOWN));
-	} else if(keyDown(KEY_UP)) {
+	} else if(keyPressed(KEY_UP)) {
 		if (dataY > 0) {
 			if(carryFlag)
 				playSound(TILEMOVESOUND);
@@ -369,12 +379,9 @@ void getKeyInput() {
 			
 			objYHeight(0) += coordsY[dataY*6+dataX];
 		}
-		
-		while(keyDown(KEY_UP));
-	} else if(keyDown(KEY_A)) {
-		if (!AButton) {
+
+	} else if(keyPressed(KEY_A)) {
 			if (carryFlag) {
-				AButton = 1;
 				if (tileConfig[dataY*6+dataX] == 0) {
 					playSound(DROPTILESOUND);
 					tileConfig[dataY*6+dataX] = currentTile;
@@ -386,28 +393,19 @@ void getKeyInput() {
 					playSound(ERRORSOUND);
 			}
 			else {
-				AButton = 1;
 				if (tileConfig[dataY*6+dataX] != 0) {
 					playSound(TAKETILESOUND);
 					currentTile = tileConfig[dataY*6+dataX];
 					tileConfig[dataY*6+dataX] = 0;
 					carryFlag = 1;
 					sprites[currentTile].attribute2 = PRIORITY(0) | (sprites[currentTile].attribute2 & 0x3FF);
-					AButton = 1;
 					objPalTile(0) = PRIORITY(3) | 512;
 				} else
 					playSound(ERRORSOUND);
 			}
-		}
-	}
-	
-	if (!keyDown(KEY_A))
-		AButton = 0;
-	
-	if(keyDown(KEY_B)) {
-		BButton = 1;
 	}
 }
+
 
 u16 Win() {
 	const u8 win[30] = {
@@ -422,6 +420,5 @@ u16 Win() {
 		if(tileConfig[i] != win[i])
 			return 0;
 	
-	playSong(WINSONG);
 	return 1;
 }
