@@ -139,7 +139,7 @@ void main() {	// The main loop
 	
 		int (*func)(void) = (int (*)(u8))0x080A3121;
 		
-		if (func() == 1) {                                       // Ignore A or B until the fanfare is done
+		if (func() == 1) {                                  // Ignore A or B until the fanfare is done
 			if (keyPressed(KEY_A) || keyPressed(KEY_B)) {   // Wait until the player presses A or B
 				LASTRESULT = 1;
 				fadeScreen();

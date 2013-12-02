@@ -1,13 +1,17 @@
 void updateEverything()
 {
-	int (*func)(void) = (int (*)(void))0x080069C1;
+
+	int (*func)(void) = (int (*)(void))0x080A910D;
 	func();
-	
-	int (*func2)(void) = (int (*)(void))0x08006A0D;
+
+	int (*func2)(void) = (int (*)(void))0x080069C1;
 	func2();
 	
-	int (*func3)(void) = (int (*)(void))0x080A1A1D;
+	int (*func3)(void) = (int (*)(void))0x08006A0D;
 	func3();
+	
+	int (*func4)(void) = (int (*)(void))0x080A1A1D;
+	func4();
 }
 
 void updateEverything2()
