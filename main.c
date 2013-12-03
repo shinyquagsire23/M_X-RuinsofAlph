@@ -10,7 +10,7 @@
 #define MenuBG  ((u16 *) 0x600F800)
 
 #define objYHeight(tile) (sprites[tile].attribute0)
-#define objXSize(tile) (sprites[tile].attribute1)
+#define objXSize(tile)   (sprites[tile].attribute1)
 #define objPalTile(tile) (sprites[tile].attribute2)
 
 #define LASTRESULT		(*(u16 *) 0x20375F0)
@@ -31,12 +31,12 @@
 
 #define MAXPEOPLE 3
 
-#define EMPTYMOVESOUND 0x05
-#define TILEMOVESOUND  0x23
-#define ERRORSOUND     0x20
-#define TAKETILESOUND  0x24
-#define DROPTILESOUND  0x2C
-#define WINSONG        0x186
+#define EMPTYMOVESOUND  0x05
+#define TILEMOVESOUND   0x23
+#define ERRORSOUND      0x20
+#define TAKETILESOUND   0x24
+#define DROPTILESOUND   0x2C
+#define WINSONG         0x186
 
 OAMEntry *sprites = ((OAMEntry *) 0x030022F8);
 
@@ -68,6 +68,9 @@ void init3() {
 	for(int i=0x10;i<0x20;i+=2) changeIO(i,0);
 	
 	clearOAM();
+	
+	int (*func)(u8,u32,u8) = (int (*)(void))0x080017E9;
+	func(0x1,0x085E5068,0x2);
 	
 	storeCallback((void *) main + 1);
 	storeCallback2((void *) updateEverything2 + 1);
@@ -263,7 +266,7 @@ void initTiles(u8 puzzleNumber) {
 	else
 		LZ77UnCompVram(tileset03_data, OBJData);
 	
-	LZ77UnCompVram(pointer_data, OBJData + 0x2000);
+	LZ77UnCompVram(pointer_data, OBJData + 0x1000);
 }
 
 const u8 coordsX[30] = {

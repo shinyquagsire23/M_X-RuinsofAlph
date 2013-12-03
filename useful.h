@@ -102,9 +102,8 @@ void clearOAM()
 	int (*func2)(void) = (int (*)(void))0x0800870D;
 	func2();
 	
-	asm("mov r0, #0x0");
-	int (*func3)(void) = (int (*)(void))0x080017BD;
-	func3();
+	int (*func3)(u8) = (int (*)(void))0x080017BD;
+	func3(0x0);
 	
 }
 
