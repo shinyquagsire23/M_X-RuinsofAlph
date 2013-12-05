@@ -28,16 +28,20 @@ void updateEverything2()
 
 void unfadeScreen()
 {
-	fadeScreen2(0x0000,0x0,0x10,0);
+	fadeScreen2(0xFFFFFFFF,0x0,0x10,0,0x0000);
 }
 
 void fadeScreen()
 {
-	fadeScreen2(0x0000,0x0,0,0x10);
+	fadeScreen2(0xFFFFFFFF,0x0,0,0x10,0x0000);
 }
 
-void fadeScreen2(/*int color, int r1, int r2, int r3*/)
+void fadeScreen2(int *bitmask, int *r1, int *r2, int *r3, int *color)
 {
+
+	int (*func)(u32,u16,u16,u16,u16) = (int (*)(void))0x080A1AD5;
+	func(bitmask,r1,r2,r3,color);
+/*
     asm("push {r4,lr}\n"
 		"add sp, #-0x4\n"
 		"str r0, [sp]\n"
@@ -53,6 +57,7 @@ void fadeScreen2(/*int color, int r1, int r2, int r3*/)
 "bx_r4:	bx r4\n"
 ".align\n"
 "addr1:	.word 0x080A1AD5\n");
+*/
 		
 }
 
@@ -117,4 +122,16 @@ void storeCallback2(int *addr)
 {	
 	int (*func)(void) = (int (*)(void))0x080006F1;
 	func();
+}
+
+void createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
+{
+	int (*func)(u32) = (int (*)(void))0x080084F9;
+	func(addr);
+	
+	int (*func2)(u32,u16,u16,u8) = (int (*)(u8))0x08006DF5;
+	u32 result = func2(addr2,XPos,YPos,0);
+	
+	result = (result*0x44) + 0x02020630;
+	
 }

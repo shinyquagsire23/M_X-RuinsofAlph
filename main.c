@@ -9,25 +9,25 @@
 #define OBJData ((u16 *) 0x6010000)
 #define MenuBG  ((u16 *) 0x600F800)
 
-#define objYHeight(tile) (sprites[tile].attribute0)
-#define objXSize(tile)   (sprites[tile].attribute1)
-#define objPalTile(tile) (sprites[tile].attribute2)
+#define objPalTile(tile) (*(u16 *) (0x02020634 + (tile*0x44)))
+#define objXPos(tile)    (*(u16 *) (0x02020650 + (tile*0x44)))
+#define objYPos(tile)    (*(u16 *) (0x02020652 + (tile*0x44)))
+#define objVisible(tile) (*(u8  *) (0x0202066E + (tile*0x44)))
 
 #define LASTRESULT		(*(u16 *) 0x20375F0)
 #define var8004			(*(u16 *) 0x20375E0)
 #define fadeScreenDone	(*(u8 *) 0x02037FDB)
 
-#define TMPSTRPTRADDR	((u32 *) 0x0203BCD0)
-#define globalVars		(*((u32 *) TMPSTRPTRADDR))
-#define counter			(*(u32 *) (globalVars + 0x0))
-#define moveFlag		(*(u16 *) (globalVars + 0x4))
-#define steps			(*(u16 *) (globalVars + 0x6))
-#define carryFlag		(*(u16 *) (globalVars + 0x8))
-#define dataX			(*(u8  *) (globalVars + 0xA))
-#define dataY			(*(u8  *) (globalVars + 0xB))
-#define currentTile		(*(u8  *) (globalVars + 0xC))
-#define currentLoop		(*(u8  *) (globalVars + 0xD))
-#define tileConfig		((u8  *) (globalVars + 0xE))	// Size of 0x1E
+#define TMPSTRPTRADDR	( (u32 *) 0x0203BCD0)
+#define globalVars		(*(u32 *) TMPSTRPTRADDR)
+#define moveFlag		(*(u16 *) (globalVars + 0x0))
+#define steps			(*(u16 *) (globalVars + 0x2))
+#define carryFlag		(*(u16 *) (globalVars + 0x4))
+#define dataX			(*(u8  *) (globalVars + 0x6))
+#define dataY			(*(u8  *) (globalVars + 0x7))
+#define currentTile		(*(u8  *) (globalVars + 0x8))
+#define currentLoop		(*(u8  *) (globalVars + 0x9))
+#define tileConfig		( (u8  *) (globalVars + 0xA))	// Size of 0x1E
 
 #define MAXPEOPLE 3
 
@@ -57,7 +57,7 @@ void init2() {
 	storeCallback2(0);
 
 	int (*func)(u32) = (int (*)(u32))0x08000B39;
-	globalVars = func(0x2C);
+	globalVars = func(0x2228);
 	currentLoop = 0;
 	
 	storeCallback((void *) init3 + 1);
@@ -84,16 +84,13 @@ void main() {	// The main loop
 		steps = 0;
 		carryFlag = moveFlag = 0;
 		dataX = dataY = 1;
-		counter = 0;
 		currentLoop = 0;
 
 		initBG();
 		initConfig(var8004);
 
-		vsync();
-
 		initTiles(var8004);
-		setTileGFobjXSize();
+		setTileGFobjXPos();
 		initVideo();
 		unfadeScreen();
 		currentLoop++;
@@ -107,17 +104,18 @@ void main() {	// The main loop
 	
 	else if (currentLoop == 2) {
 		if (!Win()) {
-			if(!carryFlag) {
+/*			if(!carryFlag) {
 				if(counter < 5000) {
 					counter++;
-					objPalTile(0) = PRIORITY(0) | 256;
+					objVisible(0) = 0x158;
 				} else if(counter < 10000) {
 					counter++;
-					objPalTile(0) = PRIORITY(0) | 512;
+					objVisible(0) = 0x558;
 				} else
 					counter = 0;
 			} else
 				counter = 0;
+			*/
 			
 			if (keyPressed(KEY_B)) {
 				LASTRESULT = 0;
@@ -129,9 +127,7 @@ void main() {	// The main loop
 		}
 		
 		else {
-			objYHeight(0) = 160;
-			objXSize(0) = 240;
-			objPalTile(0) = 0;
+			objVisible(0) = 0x5;
 			
 			playFanfare(WINSONG);
 			currentLoop++;
@@ -248,42 +244,72 @@ void initConfig(u8 puzzleNumber) {
 		memcpy(tileConfig, config3, 30);
 }
 
+const u32 OAMData1[2] = {
+	0x80000000, 0x00000000
+};
+
+const u32 OAMData2[2] = {
+	0x80000000, 0x00000400
+};
+
+const u32 OAMAnimTable2[2] = {
+	0x00000000, 0x0000FFFF
+};
+
+const u32 OAMAnimTable1[1] = {
+	OAMAnimTable2
+};
+	
 void initTiles(u8 puzzleNumber) {
-	objYHeight(0) = 55;                //set y-coordinate
-	objXSize(0) = SIZE_32 | 71;      //set size and x-coordinate
-	objPalTile(0) = PRIORITY(0) | 512; //where in VRAM we get the tile data from
-	
-	for(u8 i = 0 ; i < 9 ; i++) {
-		OBJ_PaletteMem [i] = tiles_palette[i];
-	}
-	
+
 	if(puzzleNumber == 0)
-		LZ77UnCompVram(tileset00_data, OBJData);
+		LZ77UnCompVram(tileset00_data, globalVars + 0x28);
 	else if(puzzleNumber == 1)
-		LZ77UnCompVram(tileset01_data, OBJData);
+		LZ77UnCompVram(tileset01_data, globalVars + 0x28);
 	else if(puzzleNumber == 2)
-		LZ77UnCompVram(tileset02_data, OBJData);
+		LZ77UnCompVram(tileset02_data, globalVars + 0x28);
 	else
-		LZ77UnCompVram(tileset03_data, OBJData);
+		LZ77UnCompVram(tileset03_data, globalVars + 0x28);
 	
-	LZ77UnCompVram(pointer_data, OBJData + 0x1000);
+	LZ77UnCompVram(pointer_data, globalVars + 0x2028);
+	
+	const u32 pointerData[6] = {
+		0x00000000, OAMData1, OAMAnimTable1, 0x00000000,
+		0x082EC6A8, 0x08007429
+	};
+
+	u32 pointerArt[2] = {
+		(globalVars + 0x2028), 0x00000200
+	};
+
+	u32 tilePalData[2] = {
+		tiles_palette, 0x00000000
+	};
+	
+	int (*func)(u32) = (int (*)(void))0x08008745;
+	func(tilePalData);
+	
+	createSprite(pointerArt,pointerData,0x57,0x47,0);
+	
 }
 
 const u8 coordsX[30] = {
-	0x27, 0x48, 0x60, 0x78, 0x90, 0xB1,
-	0x27, 0x48, 0x60, 0x78, 0x90, 0xB1,
-	0x27, 0x48, 0x60, 0x78, 0x90, 0xB1,
-	0x27, 0x48, 0x60, 0x78, 0x90, 0xB1,
-	0x27, 0x48, 0x60, 0x78, 0x90, 0xB1
+	0x37, 0x58, 0x70, 0x88, 0xA0, 0xC1,
+	0x37, 0x58, 0x70, 0x88, 0xA0, 0xC1,
+	0x37, 0x58, 0x70, 0x88, 0xA0, 0xC1,
+	0x37, 0x58, 0x70, 0x88, 0xA0, 0xC1,
+	0x37, 0x58, 0x70, 0x88, 0xA0, 0xC1
 };
 
 const u8 coordsY[30] = {
-	0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
-	0x38, 0x38, 0x38, 0x38, 0x38, 0x38,
-	0x50, 0x50, 0x50, 0x50, 0x50, 0x50,
-	0x68, 0x68, 0x68, 0x68, 0x68, 0x68,
-	0x80, 0x80, 0x80, 0x80, 0x80, 0x80
+	0x28, 0x28, 0x28, 0x28, 0x28, 0x28,
+	0x48, 0x48, 0x48, 0x48, 0x48, 0x48,
+	0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+	0x78, 0x78, 0x78, 0x78, 0x78, 0x78,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90
 };
+
+
 
 u16 getTilePos(u8 tileNumber) {
 	for(u32 i = 0 ; i < 30 ; i++)
@@ -293,12 +319,22 @@ u16 getTilePos(u8 tileNumber) {
 	return 0;
 }
 
-void setTileGFobjXSize() {
+void setTileGFobjXPos() {
+
 	for(u8 i = 1 ; i <= 16 ; i++) {
+	
+		u32 tileData[6] = {
+			i, OAMData2, OAMAnimTable1, 0x00000000,
+			0x082EC6A8, 0x08007429
+		};
+
+		u32 tileArt[2] = {
+			(globalVars + 0x28 + ((i - 1) * 0x200)), ((i << 0x10) + 0x200)
+		};
+
 		u16 position = getTilePos(i);
-		objYHeight(i) = coordsY[position];
-		objXSize(i) = SIZE_32 | coordsX[position];
-		objPalTile(i) = PRIORITY(1) | (i - 1) * 16;
+		createSprite(tileArt,tileData,coordsX[position],coordsY[position],i);				//PRIORITY(1) | (i - 1) * 16;
+
 	}
 }
 
@@ -310,17 +346,17 @@ void getKeyInput() {
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			objXSize(currentTile) -= coordsX[dataY*6+dataX];
+			objXPos(currentTile) -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXSize(0) -= coordsX[dataY*6+dataX];
+				objXPos(0) -= coordsX[dataY*6+dataX];
 			
 			dataX++;
 			
-			objXSize(currentTile) += coordsX[dataY*6+dataX];
+			objXPos(currentTile) += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXSize(0) += coordsX[dataY*6+dataX];
+				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_LEFT)) {
@@ -330,17 +366,17 @@ void getKeyInput() {
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			objXSize(currentTile) -= coordsX[dataY*6+dataX];
+			objXPos(currentTile) -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXSize(0) -= coordsX[dataY*6+dataX];
+				objXPos(0) -= coordsX[dataY*6+dataX];
 			
 			dataX--;
 			
-			objXSize(currentTile) += coordsX[dataY*6+dataX];
+			objXPos(currentTile) += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXSize(0) += coordsX[dataY*6+dataX];
+				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_DOWN)) {
@@ -350,17 +386,17 @@ void getKeyInput() {
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			objYHeight(currentTile) -= coordsY[dataY*6+dataX];
+			objYPos(currentTile) -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objYHeight(0) -= coordsY[dataY*6+dataX];
+				objYPos(0) -= coordsY[dataY*6+dataX];
 			
 			dataY++;
 			
 			if(currentTile != 0)
-				objYHeight(currentTile) += coordsY[dataY*6+dataX];
+				objYPos(currentTile) += coordsY[dataY*6+dataX];
 			
-			objYHeight(0) += coordsY[dataY*6+dataX];
+			objYPos(0) += coordsY[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_UP)) {
@@ -370,17 +406,17 @@ void getKeyInput() {
 			else
 				playSound(EMPTYMOVESOUND);
 			
-			objYHeight(currentTile) -= coordsY[dataY*6+dataX];
+			objYPos(currentTile) -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objYHeight(0) -= coordsY[dataY*6+dataX];
+				objYPos(0) -= coordsY[dataY*6+dataX];
 			
 			dataY--;
 			
 			if(currentTile != 0)
-				objYHeight(currentTile) += coordsY[dataY*6+dataX];
+				objYPos(currentTile) += coordsY[dataY*6+dataX];
 			
-			objYHeight(0) += coordsY[dataY*6+dataX];
+			objYPos(0) += coordsY[dataY*6+dataX];
 		}
 
 	} else if(keyPressed(KEY_A)) {
@@ -388,10 +424,10 @@ void getKeyInput() {
 				if (tileConfig[dataY*6+dataX] == 0) {
 					playSound(DROPTILESOUND);
 					tileConfig[dataY*6+dataX] = currentTile;
-					sprites[currentTile].attribute2 = PRIORITY(1) | (sprites[currentTile].attribute2 & 0x3FF);
+					objPalTile(currentTile) = PRIORITY(1) | (objPalTile(currentTile) & 0x3FF);
 					currentTile = 0;
 					carryFlag = 0;
-					objPalTile(0) = PRIORITY(0) | 512;
+					objPalTile(0) = PRIORITY(0);
 				} else
 					playSound(ERRORSOUND);
 			}
@@ -401,8 +437,8 @@ void getKeyInput() {
 					currentTile = tileConfig[dataY*6+dataX];
 					tileConfig[dataY*6+dataX] = 0;
 					carryFlag = 1;
-					sprites[currentTile].attribute2 = PRIORITY(0) | (sprites[currentTile].attribute2 & 0x3FF);
-					objPalTile(0) = PRIORITY(3) | 512;
+					objPalTile(currentTile) = PRIORITY(0) | (objPalTile(currentTile) & 0x3FF);
+					objPalTile(0) = PRIORITY(3);
 				} else
 					playSound(ERRORSOUND);
 			}
