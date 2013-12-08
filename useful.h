@@ -41,23 +41,6 @@ void fadeScreen2(int *bitmask, int *r1, int *r2, int *r3, int *color)
 
 	int (*func)(u32,u16,u16,u16,u16) = (int (*)(void))0x080A1AD5;
 	func(bitmask,r1,r2,r3,color);
-/*
-    asm("push {r4,lr}\n"
-		"add sp, #-0x4\n"
-		"str r0, [sp]\n"
-		"mov r0, #0x1\n"
-		"neg r0, r0\n"
-		"ldr r4, addr1\n"
-		"bl bx_r4\n"
-		"add sp, #0x4\n"
-		"pop {r4}\n"
-		"pop {r0}\n"
-		"bx r0\n"
-		
-"bx_r4:	bx r4\n"
-".align\n"
-"addr1:	.word 0x080A1AD5\n");
-*/
 		
 }
 
@@ -99,7 +82,7 @@ void enableBG(int *BG)
 	func();
 }
 
-void clearOAM()
+void initStuff()
 {
 	int (*func)(void) = (int (*)(void))0x08006975;
 	func();
@@ -124,7 +107,7 @@ void storeCallback2(int *addr)
 	func();
 }
 
-void createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
+u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 {
 	int (*func)(u32) = (int (*)(void))0x080084F9;
 	func(addr);
@@ -133,5 +116,47 @@ void createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 	u32 result = func2(addr2,XPos,YPos,0);
 	
 	result = (result*0x44) + 0x02020630;
+	
+	return result;
+	
+}
+
+void loadPalette(int *addr, int *offset, int *length)
+{
+	int (*func)(u32,u8,u8) = (int (*)(void))0x080A1939;
+	func(addr,offset,length);
+	
+}
+
+const u8 instsData[3] = {
+	0xF, 0x1, 0x2
+};
+
+void loadTutorialText(u32 *textAddr) {
+
+	int (*func)(u8) = (int (*)(u32))0x08098C19;		//load tutorial bar palette
+	loadPalette(func(2),0xB0,0x20);
+
+	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
+	func2(0x0,0xFF);
+	
+	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
+	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
+	
+	int (*func4)(u8) = (int (*)(void))0x0800378D;
+	func4(0x0);
+	
+	int (*func5)(u8,u8) = (int (*)(void))0x08003659;
+	func5(0x0,3);
+	
+}
+
+void reloadTutorialText(u32 *textAddr) {
+
+	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
+	func2(0x0,0xFF);
+
+	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
+	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
 	
 }
