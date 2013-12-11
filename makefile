@@ -7,3 +7,4 @@ intro.bin : main.c
 	arm-none-eabi-objcopy -O binary main.o main.bin
 	rm main.o
 	rm main.out
+	dd if=main.bin of=CrystalDust.gba conv=notrunc seek=15204880 bs=1
