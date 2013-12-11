@@ -1,4 +1,4 @@
-The Ruins of Alph code by Mastermind_X released with permission under the GPLv3 licence. At it's current state it can be built using DevKitARM as a standalone ROM. However, it cannot be inserted to any Pokemon ROMs as of yet, as it requires a custom gba.specs file. Any knowledge as to how to insert it is welcome.
+The Ruins of Alph code by Mastermind_X released with permission under the GPLv3 licence, with some code from shinyquagsire23's FRCrystalIntro. It can be built using DevKitARM.
 
 
 GPL Statement:
