@@ -192,7 +192,7 @@ u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 	int (*func2)(u32,u16,u16,u8) = (int (*)(u8))0x08006DF5;
 	u32 result = func2(addr2,XPos,YPos,0);
 	
-	result = (result*0x44) + 0x02020630;
+	result = (result*0x44) + objBaseAddr;
 	
 	return result;
 	
