@@ -124,10 +124,15 @@ void enableBG(int *BG)
 	func(BG);
 }
 
-void initStuff()
+void clearOAM()
 {
 	int (*func)(void) = (int (*)(void))0x08006975;
 	func();
+}
+
+void initStuff()
+{
+	clearOAM();
 	
 	int (*func2)(void) = (int (*)(void))0x0800870D;
 	func2();

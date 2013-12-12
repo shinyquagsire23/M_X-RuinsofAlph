@@ -40,7 +40,13 @@ void init() {
 }
 
 #include "include/gba_compress.h"
-#include "useful.h"
+
+//Select the proper useful.h for the version we're compiling
+#if (engine == BPEE)
+	#include "useful-bpee.h"
+#else
+	#include "useful-bpre.h"
+#endif
 
 void init2() {
 
@@ -138,15 +144,6 @@ void main() {					// The main loop
 	updateEverything();
 
 }
-
-#include "include/gba_compress.h"
-
-//Select the proper useful.h for the version we're compiling
-#if (engine == BPEE)
-	#include "useful-bpee.h"
-#else
-	#include "useful-bpre.h"
-#endif
 
 void initVideo() {
 

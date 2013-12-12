@@ -1,3 +1,19 @@
+#define objBaseAddr		 (u8  *) 0x02020630
+#define dummyAnimData	 (u32 *) 0x082EC6A8
+#define dummyAnimRoutine (u32 *) 0x08007429
+
+#define LASTRESULT		(*(u16 *) 0x20375F0)
+#define var8004			(*(u16 *) 0x20375E0)
+#define fadeScreenDone	(*(u8  *) (0x02037FD4 + 7))
+#define globalVars		(*(u32 *) 0x0203BCD0)
+
+#define EMPTYMOVESOUND  0x05
+#define TILEMOVESOUND   0x23
+#define ERRORSOUND      0x20
+#define TAKETILESOUND   0x24
+#define DROPTILESOUND   0x2C
+#define WINSONG         0x186
+
 //TODO Still pretty clueless here
 void updateEverything()
 {
@@ -26,6 +42,20 @@ void updateEverything2()
 	
 	int (*func3)(void) = (int (*)(void))0x080A19C1;
 	func3();
+}
+
+//TODO
+u32 malloc(int *size)
+{
+	int (*func)(u32) = (int (*)(u32))0x08000B39;
+	return func(size);
+}
+
+//TODO
+void free(int *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x08000B61;
+	func(addr);
 }
 
 void unfadeScreen()
@@ -64,10 +94,26 @@ void playFanfare(int *fanfareNum)
 	func();
 }
 
+//TODO
+u8 waitForFanfare() {
+
+	int (*func)(void) = (int (*)(u8))0x080A3121;
+	return func();
+	
+}
+
 void playSound(int *fxNum)
 {
 	int (*func)(void) = (int (*)(void))0x080722CD;
 	func();
+}
+
+//TODO
+u8 waitForSound() {
+
+	int (*func)(void) = (int (*)(u8))0x080A38A1;
+	return func();
+	
 }
 
 void changeIO(int *offset, int *value)
@@ -82,6 +128,7 @@ void enableBG(int *BG)
 	func();
 }
 
+//TODO..?
 void clearOAM()
 {
 	int (*func)(void) = (int (*)(void))0x08006975;
@@ -158,6 +205,7 @@ void loadTutorialText(u32 *textAddr) {
 	
 }
 
+//TODO
 void reloadTutorialText(u32 *textAddr) {
 
 	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
@@ -166,4 +214,32 @@ void reloadTutorialText(u32 *textAddr) {
 	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
 	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
 	
+}
+
+//TODO
+void initMapData(u8 *r0, u32 *r1, u8 *r2)
+{
+	int (*func)(u8,u32,u8) = (int (*)(void))0x080017E9;
+	func(r0,r1,r2);
+}
+
+//TODO
+void someExitFunc()
+{
+	int (*func)(void) = (int (*)(void))0x08003605;
+	func();
+}
+
+//TODO
+void forceNewBoxAndInitBG(u32 *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x080031C1;
+	func(addr);
+}
+
+//TODO
+void loadSpritePal(u32 *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x08008745;
+	func(addr);
 }
