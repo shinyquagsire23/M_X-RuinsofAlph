@@ -14,8 +14,6 @@
 #define DMA3Options		(*(u32 *) 0x040000DC)
 
 #define objPalTile(tile) (*(u16 *) (objBaseAddr + 0x04 + (tile*0x44)))
-#define objXPos(tile)    (*(u16 *) (objBaseAddr + 0x20 + (tile*0x44)))
-#define objYPos(tile)    (*(u16 *) (objBaseAddr + 0x22 + (tile*0x44)))
 #define objTimer(tile)	 (*(u16 *) (objBaseAddr + 0x30 + (tile*0x44)))
 #define objVisible(tile) (*(u8  *) (objBaseAddr + 0x2E + (tile*0x44)))
 
@@ -40,6 +38,7 @@ void init() {
 }
 
 #include "include/gba_compress.h"
+#include "useful.h"
 
 //Select the proper useful.h for the version we're compiling
 #ifdef engine
@@ -75,14 +74,13 @@ void init3() {
 		0x000001E0, 0x000011D9
 	};
 	
-	initMapData(0x1,mapDataUnk,0x2);
+	initMapData(0x0,mapDataUnk,0x2);
 	
 	storeCallback((void *) main + 1);
 	
 }
 
 void main() {					// The main loop
-storeCallback((void *) main + 1);
 	if (currentLoop == 0) {
 		currentTile = 0;
 		steps = 0;
@@ -185,11 +183,11 @@ const u8 tutorialText3[23] = {
 
 void initBG() {
 	
-	loadTutorialText(tutorialText);
 	
 	loadPalette(background_Palette,0x0,0x20);		//unpack BG pal data
 	LZ77UnCompVram(background_Tiles, Tiles);		//unpack BG tile data
 	LZ77UnCompVram(background_Map,   MapData);		//unpack BG tilemap data
+	loadTutorialText(tutorialText);
 	
 }
 
@@ -368,17 +366,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			objXPos(currentTile) -= coordsX[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.x -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXPos(0) -= coordsX[dataY*6+dataX];
+				OAMBuffer[0].oam.x -= coordsX[dataY*6+dataX];
 			
 			dataX++;
 			
-			objXPos(currentTile) += coordsX[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.x += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXPos(0) += coordsX[dataY*6+dataX];
+				OAMBuffer[0].oam.x += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_LEFT)) {
@@ -390,17 +388,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			objXPos(currentTile) -= coordsX[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.x -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXPos(0) -= coordsX[dataY*6+dataX];
+				OAMBuffer[0].oam.x -= coordsX[dataY*6+dataX];
 			
 			dataX--;
 			
-			objXPos(currentTile) += coordsX[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.x += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objXPos(0) += coordsX[dataY*6+dataX];
+				OAMBuffer[0].oam.x += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_DOWN)) {
@@ -412,17 +410,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			objYPos(currentTile) -= coordsY[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.y -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objYPos(0) -= coordsY[dataY*6+dataX];
+				OAMBuffer[0].oam.y -= coordsY[dataY*6+dataX];
 			
 			dataY++;
 			
 			if(currentTile != 0)
-				objYPos(currentTile) += coordsY[dataY*6+dataX];
+				OAMBuffer[currentTile].oam.y += coordsY[dataY*6+dataX];
 			
-			objYPos(0) += coordsY[dataY*6+dataX];
+			OAMBuffer[0].oam.y += coordsY[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_UP)) {
@@ -434,17 +432,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			objYPos(currentTile) -= coordsY[dataY*6+dataX];
+			OAMBuffer[currentTile].oam.y -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				objYPos(0) -= coordsY[dataY*6+dataX];
+				OAMBuffer[0].oam.y -= coordsY[dataY*6+dataX];
 			
 			dataY--;
 			
 			if(currentTile != 0)
-				objYPos(currentTile) += coordsY[dataY*6+dataX];
+				OAMBuffer[currentTile].oam.y += coordsY[dataY*6+dataX];
 			
-			objYPos(0) += coordsY[dataY*6+dataX];
+			OAMBuffer[0].oam.y += coordsY[dataY*6+dataX];
 		}
 
 	} else if(keyPressed(KEY_A)) {

@@ -1,30 +1,28 @@
 #define objBaseAddr		 (u8  *) 0x0202063C
+#define OAMBuffer ((OamThingy*)objBaseAddr)
 #define dummyAnimData	 (u32 *) 0x08231CFC
 #define dummyAnimRoutine (u32 *) 0x0800760D
 
+//Memory Locations
 #define OAM_Mem 	       ((u16*)0x03003128)
 #define OBJ_PaletteMem        ((u16*)0x020373F8) // Sprite Palette(256/16 colors) (adjusted for FR callback)
 #define OAM_Data                 ((u16*)0x6010000) // Sprite data (bitmapped)
- 
 #define FrontBuffer     ((u16*)0x6000000) // Front Display Memory (the screen in mode 3-5)
 #define BG_PaletteMem          ((u16*)0x020371F8) // Background Palette(256/16 colors) (adjusted for FR callback)
-
 #define BG_PaletteMem2          ((u16*)0x020375F8) // Background Palette(256/16
 #define OBJ_PaletteMem2        ((u16*)0x020377F8) // Sprite Palette(256/16 colors)
 
+//Key Stuffs
 #define KEYS         *(volatile u8*)0x0300311E
 #define KEYSHOLD     *(volatile u8*)0x0300311C
- 
-//Use like this: if(keyPressed(KEY_A)) {};
-#define keyPressed(k)    (KEYS & k)
-#define keyHeldDown(k)   (KEYSHOLD & k)
-
 #define KEYSLR       *(volatile u8*)0x0300311F
 #define KEYSHOLDLR   *(volatile u8*)0x0300311D
-
+#define keyPressed(k)    (KEYS & k)
+#define keyHeldDown(k)   (KEYSHOLD & k)
 #define keyPressedLR(k)  (KEYSLR & k)
 #define keyHeldDownLR(k) (KEYSHOLDLR & k)
 
+//Variables and Such
 #define LASTRESULT		(*(u16 *) 0x020370D0)
 #define var8004			(*(u16 *) 0x020370C0)
 #define fadeScreenDone	(*(u8  *) (0x02037AB8 + 7))
@@ -32,6 +30,7 @@
 #define boxInitStuff 0x083E22C0
 #define nullCallback 0x08015B59
 
+//RoA Sounds
 #define EMPTYMOVESOUND  0x05
 #define TILEMOVESOUND   0x23
 #define ERRORSOUND      0x20
@@ -67,7 +66,7 @@ void updateEverything2()
 	func();
 	
 	int (*func2)(void) = (int (*)(void))0x08007611;
-	func2();
+	//func2();
 	
 	int (*func3)(void) = (int (*)(void))0x08070475;
 	func3();
@@ -224,10 +223,10 @@ void writeBoxesToTilemap(u8 a, u8 b)
 	func5(a,b);
 }
 
-void drawTutorialBar(u8 a, u8 b)
+void drawTutorialBar(u8 background, u8 type)
 {
 	int (*func2)(u8,u8) = (int (*)(void))0x0800445D;
-	func2(a,b);
+	func2(background,type);
 }
 
 void loadTutorialText(u32 *textAddr) 
@@ -238,7 +237,7 @@ void loadTutorialText(u32 *textAddr)
 	boxPrint(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
 	
 	int (*func4)(u8) = (int (*)(void))0x08003FA1;
-	func4(0x0);
+	func4(0x0); //Something with BGs
 	
 	writeBoxesToTilemap(0x0,3);
 	
@@ -265,7 +264,7 @@ void someExitFunc()
 void forceNewBoxAndInitBG(u32 *addr)
 {
 	int (*func)(u32) = (int (*)(void))0x08003015;
-	func(addr);
+	//func(addr);
 }
 
 void loadSpritePal(u32 *addr)
