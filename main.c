@@ -13,18 +13,12 @@
 #define DMA3Dest		(*(u32 *) 0x040000D8)
 #define DMA3Options		(*(u32 *) 0x040000DC)
 
-#define objPalTile(tile) (*(u16 *) (0x02020634 + (tile*0x44)))
-#define objXPos(tile)    (*(u16 *) (0x02020650 + (tile*0x44)))
-#define objYPos(tile)    (*(u16 *) (0x02020652 + (tile*0x44)))
-#define objVisible(tile) (*(u8  *) (0x0202065E + (tile*0x44)))
-#define objTimer(tile)	 (*(u8  *) (0x02020660 + (tile*0x44)))
+#define objPalTile(tile) (*(u16 *) (objBaseAddr + 0x04 + (tile*0x44)))
+#define objXPos(tile)    (*(u16 *) (objBaseAddr + 0x20 + (tile*0x44)))
+#define objYPos(tile)    (*(u16 *) (objBaseAddr + 0x22 + (tile*0x44)))
+#define objTimer(tile)	 (*(u16 *) (objBaseAddr + 0x30 + (tile*0x44)))
+#define objVisible(tile) (*(u8  *) (objBaseAddr + 0x2E + (tile*0x44)))
 
-#define LASTRESULT		(*(u16 *) 0x20375F0)
-#define var8004			(*(u16 *) 0x20375E0)
-#define fadeScreenDone	(*(u8 *) 0x02037FDB)
-
-#define TMPSTRPTRADDR	( (u32 *) 0x0203BCD0)
-#define globalVars		(*(u32 *) TMPSTRPTRADDR)
 #define moveFlag		(*(u16 *) (globalVars + 0x0))
 #define steps			(*(u16 *) (globalVars + 0x2))
 #define carryFlag		(*(u16 *) (globalVars + 0x4))
@@ -34,18 +28,10 @@
 #define currentLoop		(*(u8  *) (globalVars + 0x9))
 #define tileConfig		( (u8  *) (globalVars + 0xA))	// Size of 0x1E
 
-#define EMPTYMOVESOUND  0x05
-#define TILEMOVESOUND   0x23
-#define ERRORSOUND      0x20
-#define TAKETILESOUND   0x24
-#define DROPTILESOUND   0x2C
-#define WINSONG         0x186
-
 u16 Win();
 void init2();
 void init3();
 void main();
-void updateEverything2();
 
 void init() {
 
@@ -53,12 +39,13 @@ void init() {
 	
 }
 
+#include "include/gba_compress.h"
+#include "useful.h"
+
 void init2() {
 
 	storeCallback2(0);
-
-	int (*func)(u32) = (int (*)(u32))0x08000B39;
-	globalVars = func(0x2228);						//malloc 0x2228 bytes
+	globalVars = malloc(0x2228);						//malloc 0x2228 bytes
 	
 	int blank = 0;
 	DMA3Source = &blank;
@@ -80,8 +67,7 @@ void init3() {
 		0x000001E0, 0x000011D9
 	};
 	
-	int (*func)(u8,u32,u8) = (int (*)(void))0x080017E9;
-	func(0x1,mapDataUnk,0x2);
+	initMapData(0x1,mapDataUnk,0x2);
 	
 	storeCallback((void *) main + 1);
 	
@@ -120,8 +106,7 @@ void main() {					// The main loop
 		}
 		
 		else {
-			int (*func)(void) = (int (*)(u8))0x080A38A1;
-			if (func() == 0) {
+			if (waitForSound() == 0) {
 				playFanfare(WINSONG);
 				currentLoop++;
 			}
@@ -129,10 +114,8 @@ void main() {					// The main loop
 	}
 	
 	else if (currentLoop == 3) {
-	
-		int (*func)(void) = (int (*)(u8))0x080A3121;
 		
-		if (func() == 1) {                                  // Ignore A or B until the fanfare is done
+		if (waitForFanfare() == 1) {                        // Ignore A or B until the fanfare is done
 			if (keyPressed(KEY_A) || keyPressed(KEY_B)) {   // Wait until the player presses A or B
 				LASTRESULT = 1;
 				fadeScreen();
@@ -145,12 +128,10 @@ void main() {					// The main loop
 		if (fadeScreenDone == 0) {
 			storeCallback(0x080861CD);
 			if (globalVars != 0) {
-				int (*func)(u32) = (int (*)(void))0x08000B61;
-				func(globalVars);
+				free(globalVars);
 				globalVars = 0;
 			}
-			int (*func2)(void) = (int (*)(void))0x08003605;
-			func2();
+			someExitFunc();
 		}
 	}
 	
@@ -167,7 +148,6 @@ void main() {					// The main loop
 	#include "useful-bpre.h"
 #endif
 
-
 void initVideo() {
 
 	changeIO(0,OBJ_ENABLE | OBJ_MAP_1D);
@@ -182,8 +162,7 @@ void initVideo() {
 		DMA3Options = 0x81000800;
 	}
 	
-	int (*func)(u32) = (int (*)(void))0x080031C1;
-	func(0x0858BE30);
+	forceNewBoxAndInitBG(0x0858BE30);
 	
 	enableBG(0);
 	enableBG(1);
@@ -316,7 +295,7 @@ void initTiles(u8 puzzleNumber) {
 	
 	const u32 pointerData[6] = {
 		0x00000000, OAMData1, OAMAnimTable1, 0x00000000,
-		0x082EC6A8, pointerAnimFunc
+		dummyAnimData, pointerAnimFunc
 	};
 
 	u32 pointerArt[2] = {
@@ -327,8 +306,7 @@ void initTiles(u8 puzzleNumber) {
 		tiles_palette, 0x00000000
 	};
 	
-	int (*func)(u32) = (int (*)(void))0x08008745;
-	func(tilePalData);
+	loadSpritePal(tilePalData);
 	
 	int result = createSprite(pointerArt,pointerData,0x57,0x47,0);
 	
@@ -368,7 +346,7 @@ void setTileGFobjXPos() {
 	
 		u32 tileData[6] = {
 			i, OAMData2, OAMAnimTable1, 0x00000000,
-			0x082EC6A8, 0x08007429
+			dummyAnimData, dummyAnimRoutine
 		};
 
 		u32 tileArt[2] = {

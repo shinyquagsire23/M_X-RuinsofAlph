@@ -1,3 +1,19 @@
+#define objBaseAddr		 (u8  *) 0x02020630
+#define dummyAnimData	 (u32 *) 0x082EC6A8
+#define dummyAnimRoutine (u32 *) 0x08007429
+
+#define LASTRESULT		(*(u16 *) 0x20375F0)
+#define var8004			(*(u16 *) 0x20375E0)
+#define fadeScreenDone	(*(u8  *) (0x02037FD4 + 7))
+#define globalVars		(*(u32 *) 0x0203BCD0)
+
+#define EMPTYMOVESOUND  0x05
+#define TILEMOVESOUND   0x23
+#define ERRORSOUND      0x20
+#define TAKETILESOUND   0x24
+#define DROPTILESOUND   0x2C
+#define WINSONG         0x186
+
 void updateEverything()
 {
 
@@ -24,6 +40,18 @@ void updateEverything2()
 	
 	int (*func3)(void) = (int (*)(void))0x080A19C1;
 	func3();
+}
+
+u32 malloc(int *size)
+{
+	int (*func)(u32) = (int (*)(u32))0x08000B39;
+	return func(size);
+}
+
+void free(int *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x08000B61;
+	func(addr);
 }
 
 void unfadeScreen()
@@ -60,26 +88,40 @@ void copyMem(void *source, void *dest, void *size)
 
 void playFanfare(int *fanfareNum)
 {
-	int (*func)(void) = (int (*)(void))0x080A30E5;
-	func();
+	int (*func)(u16) = (int (*)(void))0x080A30E5;
+	func(fanfareNum);
 }
 
-void playSound(int *fxNum)
+u8 waitForFanfare() {
+
+	int (*func)(void) = (int (*)(u8))0x080A3121;
+	return func();
+	
+}
+
+void playSound(int *soundNum)
 {
-	int (*func)(void) = (int (*)(void))0x080A37A5;
-	func();
+	int (*func)(u16) = (int (*)(void))0x080A37A5;
+	func(soundNum);
+}
+
+u8 waitForSound() {
+
+	int (*func)(void) = (int (*)(u8))0x080A38A1;
+	return func();
+	
 }
 
 void changeIO(int *offset, int *value)
 {
-	int (*func)(void) = (int (*)(void))0x080010B5;
-	func();
+	int (*func)(u32,u16) = (int (*)(void))0x080010B5;
+	func(offset,value);
 }
 
 void enableBG(int *BG)
 {
-	int (*func)(void) = (int (*)(void))0x08001B31;
-	func();
+	int (*func)(u8) = (int (*)(void))0x08001B31;
+	func(BG);
 }
 
 void initStuff()
@@ -97,14 +139,14 @@ void initStuff()
 
 void storeCallback(int *addr)
 {
-	int (*func)(void) = (int (*)(void))0x08000541;
-	func();
+	int (*func)(u32) = (int (*)(void))0x08000541;
+	func(addr);
 }	
 
 void storeCallback2(int *addr)
 {	
-	int (*func)(void) = (int (*)(void))0x080006F1;
-	func();
+	int (*func)(u32) = (int (*)(void))0x080006F1;
+	func(addr);
 }
 
 u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
@@ -132,8 +174,8 @@ const u8 instsData[3] = {
 	0xF, 0x1, 0x2
 };
 
-void loadTutorialText(u32 *textAddr) {
-
+void loadTutorialText(u32 *textAddr)
+{
 	int (*func)(u8) = (int (*)(u32))0x08098C19;		//load tutorial bar palette
 	loadPalette(func(2),0xB0,0x20);
 
@@ -148,15 +190,37 @@ void loadTutorialText(u32 *textAddr) {
 	
 	int (*func5)(u8,u8) = (int (*)(void))0x08003659;
 	func5(0x0,3);
-	
 }
 
-void reloadTutorialText(u32 *textAddr) {
-
+void reloadTutorialText(u32 *textAddr)
+{
 	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
 	func2(0x0,0xFF);
 
 	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
 	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
-	
+}
+
+void initMapData(u8 *r0, u32 *r1, u8 *r2)
+{
+	int (*func)(u8,u32,u8) = (int (*)(void))0x080017E9;
+	func(r0,r1,r2);
+}
+
+void someExitFunc()
+{
+	int (*func)(void) = (int (*)(void))0x08003605;
+	func();
+}
+
+void forceNewBoxAndInitBG(u32 *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x080031C1;
+	func(addr);
+}
+
+void loadSpritePal(u32 *addr)
+{
+	int (*func)(u32) = (int (*)(void))0x08008745;
+	func(addr);
 }
