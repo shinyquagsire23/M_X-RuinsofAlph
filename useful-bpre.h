@@ -17,44 +17,46 @@
 //TODO Still pretty clueless here
 void updateEverything()
 {
-
-	int (*func)(void) = (int (*)(void))0x080A910D;
-	func();
+	callback3();
 
 	int (*func2)(void) = (int (*)(void))0x08006B5D; //call_back_oam
 	func2();
 	
-	int (*func3)(void) = (int (*)(void))0x08006A0D;
+	int (*func3)(void) = (int (*)(void))0x08006BA9; //write oam
 	func3();
 	
-	int (*func4)(void) = (int (*)(void))0x080A1A1D;
+	int (*func4)(void) = (int (*)(void))0x080704D1; //idk
 	func4();
 }
 
-//TODO Still pretty clueless here
+void callback3()
+{
+	int (*func)(void) = (int (*)(void))0x08077579;
+	func();
+}
+
+//TODO Find actual names
 void updateEverything2()
 {
-	int (*func)(void) = (int (*)(void))0x08007189;
+	int (*func)(void) = (int (*)(void))0x08007321;
 	func();
 	
-	int (*func2)(void) = (int (*)(void))0x0800742D;
+	int (*func2)(void) = (int (*)(void))0x08007611;
 	func2();
 	
-	int (*func3)(void) = (int (*)(void))0x080A19C1;
+	int (*func3)(void) = (int (*)(void))0x08070475;
 	func3();
 }
 
-//TODO
 u32 malloc(int *size)
 {
-	int (*func)(u32) = (int (*)(u32))0x08000B39;
+	int (*func)(u32) = (int (*)(u32))0x08002B9D;
 	return func(size);
 }
 
-//TODO
 void free(int *addr)
 {
-	int (*func)(u32) = (int (*)(void))0x08000B61;
+	int (*func)(u32) = (int (*)(void))0x08002BC5;
 	func(addr);
 }
 
@@ -94,10 +96,9 @@ void playFanfare(int *fanfareNum)
 	func();
 }
 
-//TODO
 u8 waitForFanfare() {
 
-	int (*func)(void) = (int (*)(u8))0x080A3121;
+	int (*func)(void) = (int (*)(u8))0x08071C9D;
 	return func();
 	
 }
@@ -108,11 +109,12 @@ void playSound(int *fxNum)
 	func();
 }
 
-//TODO
+//TODO Actally call function
 u8 waitForSound() {
 
-	int (*func)(void) = (int (*)(u8))0x080A38A1;
-	return func();
+	return 1;
+	//int (*func)(void) = (int (*)(u8))0x080A38A1;
+	//return func();
 	
 }
 
@@ -128,10 +130,9 @@ void enableBG(int *BG)
 	func();
 }
 
-//TODO..?
 void clearOAM()
 {
-	int (*func)(void) = (int (*)(void))0x08006975;
+	int (*func)(void) = (int (*)(void))0x08006B11;
 	func();
 }
 
@@ -140,23 +141,24 @@ void initStuff()
 {
 	clearOAM();
 	
-	int (*func2)(void) = (int (*)(void))0x0800870D;
+	int (*func2)(void) = (int (*)(void))0x080088F1; //Still no idea
 	func2();
 	
-	int (*func3)(u8) = (int (*)(void))0x080017BD;
+	int (*func3)(u8) = (int (*)(void))0x08001619; //Still no idea about this one either
 	func3(0x0);
 	
 }
 
+//Unsure about this guy...
 void storeCallback(int *addr)
 {
-	int (*func)(void) = (int (*)(void))0x08000541; //TODO
+	int (*func)(void) = (int (*)(void))0x080006F5;
 	func();
 }	
 
 void storeCallback2(int *addr)
 {	
-	int (*func)(void) = (int (*)(void))0x080006F1; //TODO
+	int (*func)(void) = (int (*)(void))0x08000545;
 	func();
 }
 
@@ -185,61 +187,64 @@ const u8 instsData[3] = {
 	0xF, 0x1, 0x2
 };
 
-//BIG TODO
-void loadTutorialText(u32 *textAddr) {
+void boxPrint(u8 slot, u8 font, u8 x, u8 y, u32 bar, u32 baz, u32 txtpointer)
+{
+	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x0812E51D;
+	func3(foo,font,x,y,bar,baz,txtpointer);
+}
 
-	int (*func)(u8) = (int (*)(u32))0x08098C19;		//load tutorial bar palette
+void writeBoxesToTilemap(u8 a, u8 b)
+{
+	int (*func5)(u8,u8) = (int (*)(void))0x08003F21;
+	func5(a,b);
+}
+
+void drawTutorialBar(u8 a, u8 b)
+{
+	int (*func2)(u8,u8) = (int (*)(void))0x0800445D;
+	func2(a,b);
+}
+
+void loadTutorialText(u32 *textAddr) 
+{
+	int (*func)(u8) = (int (*)(u32))0x08150409;		//load tutorial bar palette
 	loadPalette(func(2),0xB0,0x20);
-
-	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
-	func2(0x0,0xFF);
+	drawTutorialBar(0x0,0xFF);
+	boxPrint(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
 	
-	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
-	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
-	
-	int (*func4)(u8) = (int (*)(void))0x0800378D;
+	int (*func4)(u8) = (int (*)(void))0x08003FA1;
 	func4(0x0);
 	
-	int (*func5)(u8,u8) = (int (*)(void))0x08003659;
-	func5(0x0,3);
+	writeBoxesToTilemap(0x0,3);
 	
 }
 
-//TODO
-void reloadTutorialText(u32 *textAddr) {
-
-	int (*func2)(u8,u8) = (int (*)(void))0x08003C49;
-	func2(0x0,0xFF);
-
-	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x08199E65;
-	func3(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
-	
+void reloadTutorialText(u32 *textAddr) 
+{
+	drawTutorialBar(0x0,0xFF);
+	boxPrint(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
 }
 
-//TODO
 void initMapData(u8 *r0, u32 *r1, u8 *r2)
 {
-	int (*func)(u8,u32,u8) = (int (*)(void))0x080017E9;
+	int (*func)(u8,u32,u8) = (int (*)(void))0x08001659;
 	func(r0,r1,r2);
 }
 
-//TODO
 void someExitFunc()
 {
-	int (*func)(void) = (int (*)(void))0x08003605;
+	int (*func)(void) = (int (*)(void))0x08003ECD;
 	func();
 }
 
-//TODO
 void forceNewBoxAndInitBG(u32 *addr)
 {
-	int (*func)(u32) = (int (*)(void))0x080031C1;
+	int (*func)(u32) = (int (*)(void))0x08003015;
 	func(addr);
 }
 
-//TODO
 void loadSpritePal(u32 *addr)
 {
-	int (*func)(u32) = (int (*)(void))0x08008745;
+	int (*func)(u32) = (int (*)(void))0x08008929;
 	func(addr);
 }
