@@ -82,7 +82,7 @@ void init3() {
 }
 
 void main() {					// The main loop
-
+storeCallback((void *) main + 1);
 	if (currentLoop == 0) {
 		currentTile = 0;
 		steps = 0;
@@ -109,7 +109,7 @@ void main() {					// The main loop
 	
 	else if (currentLoop == 2) {
 		if (!Win()) {
-
+playFanfare(WINSONG);
 			getKeyInput();
 		}
 		
@@ -134,7 +134,7 @@ void main() {					// The main loop
 	
 	else if (currentLoop == 4) {
 		if (fadeScreenDone == 0) {
-			storeCallback(0x080861CD);
+			storeCallback(nullCallback);
 			if (globalVars != 0) {
 				free(globalVars);
 				globalVars = 0;
@@ -161,7 +161,7 @@ void initVideo() {
 		DMA3Options = 0x81000800;
 	}
 	
-	forceNewBoxAndInitBG(0x0858BE30);
+	forceNewBoxAndInitBG(boxInitStuff);
 	
 	enableBG(0);
 	enableBG(1);

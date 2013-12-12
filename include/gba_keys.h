@@ -18,17 +18,4 @@
 #define KEY_R      0x01
 #define KEY_L      0x02
  
-#define KEYS         *(volatile u8*)0x030022EE
-#define KEYSHOLD     *(volatile u8*)0x030022EC
- 
-//Use like this: if(keyPressed(KEY_A)) {};
-#define keyPressed(k)    (KEYS & k)
-#define keyHeldDown(k)   (KEYSHOLD & k)
-
-#define KEYSLR       *(volatile u8*)0x030022EF
-#define KEYSHOLDLR   *(volatile u8*)0x030022ED
-
-#define keyPressedLR(k)  (KEYSLR & k)
-#define keyHeldDownLR(k) (KEYSHOLDLR & k)
- 
 #endif

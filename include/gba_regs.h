@@ -7,15 +7,8 @@
  
 #include "gba_types.h"
  
-#define OAM_Mem                ((u16*)0x030022F8) // Sprites(128), coordinates, size..(total 1Kb) (adjusted for FR callback)
-#define OBJ_PaletteMem        ((u16*)0x02037914) // Sprite Palette(256/16 colors) (adjusted for FR callback)
-#define OAM_Data                 ((u16*)0x6010000) // Sprite data (bitmapped)
- 
-#define FrontBuffer     ((u16*)0x6000000) // Front Display Memory (the screen in mode 3-5)
-#define BG_PaletteMem          ((u16*)0x02037714) // Background Palette(256/16 colors) (adjusted for FR callback)
+ // Sprites(128), coordinates, size..(total 1Kb) (adjusted for FR callback)
 
-#define BG_PaletteMem2          ((u16*)0x02037B14) // Background Palette(256/16
-#define OBJ_PaletteMem2        ((u16*)0x02037D14) // Sprite Palette(256/16 colors)
 
 
 #define BG0CNT			*(u16*)0x4000008

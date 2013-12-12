@@ -1,11 +1,36 @@
 #define objBaseAddr		 (u8  *) 0x0202063C
 #define dummyAnimData	 (u32 *) 0x08231CFC
-#define dummyAnimRoutine (u32 *) 0x08007429
+#define dummyAnimRoutine (u32 *) 0x0800760D
 
-#define LASTRESULT		(*(u16 *) 0x20375F0)
-#define var8004			(*(u16 *) 0x20375E0)
-#define fadeScreenDone	(*(u8  *) (0x02037FD4 + 7))
+#define OAM_Mem 	       ((u16*)0x03003128)
+#define OBJ_PaletteMem        ((u16*)0x020373F8) // Sprite Palette(256/16 colors) (adjusted for FR callback)
+#define OAM_Data                 ((u16*)0x6010000) // Sprite data (bitmapped)
+ 
+#define FrontBuffer     ((u16*)0x6000000) // Front Display Memory (the screen in mode 3-5)
+#define BG_PaletteMem          ((u16*)0x020371F8) // Background Palette(256/16 colors) (adjusted for FR callback)
+
+#define BG_PaletteMem2          ((u16*)0x020375F8) // Background Palette(256/16
+#define OBJ_PaletteMem2        ((u16*)0x020377F8) // Sprite Palette(256/16 colors)
+
+#define KEYS         *(volatile u8*)0x0300311E
+#define KEYSHOLD     *(volatile u8*)0x0300311C
+ 
+//Use like this: if(keyPressed(KEY_A)) {};
+#define keyPressed(k)    (KEYS & k)
+#define keyHeldDown(k)   (KEYSHOLD & k)
+
+#define KEYSLR       *(volatile u8*)0x0300311F
+#define KEYSHOLDLR   *(volatile u8*)0x0300311D
+
+#define keyPressedLR(k)  (KEYSLR & k)
+#define keyHeldDownLR(k) (KEYSHOLDLR & k)
+
+#define LASTRESULT		(*(u16 *) 0x020370D0)
+#define var8004			(*(u16 *) 0x020370C0)
+#define fadeScreenDone	(*(u8  *) (0x02037AB8 + 7))
 #define globalVars		(*(u32 *) 0x0203BCD0)
+#define boxInitStuff 0x083E22C0
+#define nullCallback 0x08015B59
 
 #define EMPTYMOVESOUND  0x05
 #define TILEMOVESOUND   0x23
