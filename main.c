@@ -14,6 +14,8 @@
 #define DMA3Options		(*(u32 *) 0x040000DC)
 
 #define objPalTile(tile) (*(u16 *) (objBaseAddr + 0x04 + (tile*0x44)))
+#define objXPos(tile)    (*(u16 *) (objBaseAddr + 0x20 + (tile*0x44)))
+#define objYPos(tile)    (*(u16 *) (objBaseAddr + 0x22 + (tile*0x44)))
 #define objTimer(tile)	 (*(u16 *) (objBaseAddr + 0x30 + (tile*0x44)))
 #define objVisible(tile) (*(u8  *) (objBaseAddr + 0x2E + (tile*0x44)))
 
@@ -25,6 +27,7 @@
 #define currentTile		(*(u8  *) (globalVars + 0x8))
 #define currentLoop		(*(u8  *) (globalVars + 0x9))
 #define tileConfig		( (u8  *) (globalVars + 0xA))	// Size of 0x1E
+
 
 u16 Win();
 void init2();
@@ -74,13 +77,14 @@ void init3() {
 		0x000001E0, 0x000011D9
 	};
 	
-	initMapData(0x0,mapDataUnk,0x2);
+	initMapData(0x1,mapDataUnk,0x2);
 	
 	storeCallback((void *) main + 1);
 	
 }
 
 void main() {					// The main loop
+storeCallback((void *) main + 1);
 	if (currentLoop == 0) {
 		currentTile = 0;
 		steps = 0;
@@ -107,7 +111,6 @@ void main() {					// The main loop
 	
 	else if (currentLoop == 2) {
 		if (!Win()) {
-playFanfare(WINSONG);
 			getKeyInput();
 		}
 		
@@ -183,11 +186,11 @@ const u8 tutorialText3[23] = {
 
 void initBG() {
 	
+	loadTutorialText(tutorialText);
 	
 	loadPalette(background_Palette,0x0,0x20);		//unpack BG pal data
 	LZ77UnCompVram(background_Tiles, Tiles);		//unpack BG tile data
 	LZ77UnCompVram(background_Map,   MapData);		//unpack BG tilemap data
-	loadTutorialText(tutorialText);
 	
 }
 
@@ -366,17 +369,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			OAMBuffer[currentTile].oam.x -= coordsX[dataY*6+dataX];
+			objXPos(currentTile) -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.x -= coordsX[dataY*6+dataX];
+				objXPos(0) -= coordsX[dataY*6+dataX];
 			
 			dataX++;
 			
-			OAMBuffer[currentTile].oam.x += coordsX[dataY*6+dataX];
+			objXPos(currentTile) += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.x += coordsX[dataY*6+dataX];
+				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_LEFT)) {
@@ -388,17 +391,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			OAMBuffer[currentTile].oam.x -= coordsX[dataY*6+dataX];
+			objXPos(currentTile) -= coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.x -= coordsX[dataY*6+dataX];
+				objXPos(0) -= coordsX[dataY*6+dataX];
 			
 			dataX--;
 			
-			OAMBuffer[currentTile].oam.x += coordsX[dataY*6+dataX];
+			objXPos(currentTile) += coordsX[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.x += coordsX[dataY*6+dataX];
+				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_DOWN)) {
@@ -410,17 +413,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			OAMBuffer[currentTile].oam.y -= coordsY[dataY*6+dataX];
+			objYPos(currentTile) -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.y -= coordsY[dataY*6+dataX];
+				objYPos(0) -= coordsY[dataY*6+dataX];
 			
 			dataY++;
 			
 			if(currentTile != 0)
-				OAMBuffer[currentTile].oam.y += coordsY[dataY*6+dataX];
+				objYPos(currentTile) += coordsY[dataY*6+dataX];
 			
-			OAMBuffer[0].oam.y += coordsY[dataY*6+dataX];
+			objYPos(0) += coordsY[dataY*6+dataX];
 		}
 		
 	} else if(keyPressed(KEY_UP)) {
@@ -432,17 +435,17 @@ void getKeyInput() {
 				playSound(EMPTYMOVESOUND);
 			}
 			
-			OAMBuffer[currentTile].oam.y -= coordsY[dataY*6+dataX];
+			objYPos(currentTile) -= coordsY[dataY*6+dataX];
 			
 			if(currentTile != 0)
-				OAMBuffer[0].oam.y -= coordsY[dataY*6+dataX];
+				objYPos(0) -= coordsY[dataY*6+dataX];
 			
 			dataY--;
 			
 			if(currentTile != 0)
-				OAMBuffer[currentTile].oam.y += coordsY[dataY*6+dataX];
+				objYPos(currentTile) += coordsY[dataY*6+dataX];
 			
-			OAMBuffer[0].oam.y += coordsY[dataY*6+dataX];
+			objYPos(0) += coordsY[dataY*6+dataX];
 		}
 
 	} else if(keyPressed(KEY_A)) {
