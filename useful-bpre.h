@@ -59,7 +59,7 @@ void updateEverything2()
 	func();
 	
 	int (*func2)(void) = (int (*)(void))0x08007611;
-	//func2();
+	func2();
 	
 	int (*func3)(void) = (int (*)(void))0x08070475;
 	func3();
@@ -257,7 +257,7 @@ void someExitFunc()
 void forceNewBoxAndInitBG(u32 *addr)
 {
 	int (*func)(u32) = (int (*)(void))0x08003015;
-	//func(addr);
+	func(addr);
 }
 
 void loadSpritePal(u32 *addr)
