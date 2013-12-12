@@ -3,12 +3,6 @@ default_target: bpre
 
 TARGET = $@
 
-ifeq (TARGET,bpee)
-engine = BPEE
-else
-engine = BPRE
-endif
-
 ifdef offset
 INSERT=$(shell printf "%d" 0x$(offset))
 endif
@@ -20,7 +14,7 @@ OPTS := -fauto-inc-dec -fcompare-elim -fcprop-registers -fdce -fdefer-pop -fdela
 #Build for Fire Red
 #
 bpre : 
-	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -g -c -w -std=gnu99 -o main.out main.c
+	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -Dengine=0 -g -c -w -std=gnu99 -o main.out main.c
 	arm-none-eabi-ld -o main.o -T linker.lsc main.out
 	arm-none-eabi-objcopy -O binary main.o main.bin
 	rm main.o
@@ -47,7 +41,7 @@ endif
 #Build for Emerald
 #
 bpee : 
-	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -g -c -w -std=gnu99 -o main.out main.c
+	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -Dengine=1 -g -c -w -std=gnu99 -o main.out main.c
 	arm-none-eabi-ld -o main.o -T linker.lsc main.out
 	arm-none-eabi-objcopy -O binary main.o main.bin
 	rm main.o

@@ -42,10 +42,12 @@ void init() {
 #include "include/gba_compress.h"
 
 //Select the proper useful.h for the version we're compiling
-#if (engine == BPEE)
+#ifdef engine
+#if engine == 1
 	#include "useful-bpee.h"
 #else
 	#include "useful-bpre.h"
+#endif
 #endif
 
 void init2() {
