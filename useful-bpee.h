@@ -40,8 +40,8 @@
 
 void updateEverything()
 {
-
-	callback3();
+	int (*func)(void) = (int (*)(void))0x080A910D;
+	func();
 
 	int (*func2)(void) = (int (*)(void))0x080069C1;
 	func2();
@@ -51,12 +51,6 @@ void updateEverything()
 	
 	int (*func4)(void) = (int (*)(void))0x080A1A1D;
 	func4();
-}
-
-void callback3()
-{
-	int (*func)(void) = (int (*)(void))0x080A910D;
-	func();
 }
 
 //TODO Find actual names

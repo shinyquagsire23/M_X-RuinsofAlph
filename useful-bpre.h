@@ -38,28 +38,21 @@
 #define DROPTILESOUND   0x2C
 #define WINSONG         0x186
 
-//TODO Still pretty clueless here
 void updateEverything()
 {
+	int (*callback3)(void) = (int (*)(void))0x08077579;
 	callback3();
 
-	int (*func2)(void) = (int (*)(void))0x08006B5D; //call_back_oam
-	func2();
+	int (*callbackOAM)(void) = (int (*)(void))0x08006B5D; //call_back_oam
+	callbackOAM();
 	
-	int (*func3)(void) = (int (*)(void))0x08006BA9; //write oam
-	func3();
+	int (*writeOAM)(void) = (int (*)(void))0x08006BA9; //write oam
+	writeOAM();
 	
 	int (*func4)(void) = (int (*)(void))0x080704D1; //idk
 	func4();
 }
 
-void callback3()
-{
-	int (*func)(void) = (int (*)(void))0x08077579;
-	func();
-}
-
-//TODO Find actual names
 void updateEverything2()
 {
 	int (*func)(void) = (int (*)(void))0x08007321;
