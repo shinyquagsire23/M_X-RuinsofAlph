@@ -25,7 +25,7 @@ bpre :
 #Auto-Insert into the ROM
 ifdef fname
 ifdef INSERT
-	dd if=main.bin of=$(fname) conv=notrunc seek=$(INSERT) bs=1
+	dd if=main.bin of="$(fname)" conv=notrunc seek=$(INSERT) bs=1
 else
 	@echo "Insertion location not found!"
 	@echo "Did you forget to define 'offset'?"
@@ -53,7 +53,7 @@ bpee :
 #Auto-Insert into the ROM
 ifdef fname
 ifdef INSERT
-	dd if=main.bin of=$(fname) conv=notrunc seek=$(INSERT) bs=1
+	dd if=main.bin of="$(fname)" conv=notrunc seek=$(INSERT) bs=1
 endif
 endif
 
