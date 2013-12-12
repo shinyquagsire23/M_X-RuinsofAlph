@@ -14,11 +14,13 @@ OPTS := -fauto-inc-dec -fcompare-elim -fcprop-registers -fdce -fdefer-pop -fdela
 #Build for Fire Red
 #
 bpre : 
+	sed 's/^        rom     : ORIGIN = 0x08XXXXXX, LENGTH = 32M$$/        rom     : ORIGIN = 0x08$(offset), LENGTH = 32M/' linker_base.lsc > linker.lsc
 	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -Dengine=0 -g -c -w -std=gnu99 -o main.out main.c
 	arm-none-eabi-ld -o main.o -T linker.lsc main.out
 	arm-none-eabi-objcopy -O binary main.o main.bin
 	rm main.o
 	rm main.out
+	rm linker.lsc
 
 #Auto-Insert into the ROM
 ifdef fname
@@ -46,6 +48,7 @@ bpee :
 	arm-none-eabi-objcopy -O binary main.o main.bin
 	rm main.o
 	rm main.out
+	rm linker.lsc
 
 #Auto-Insert into the ROM
 ifdef fname
