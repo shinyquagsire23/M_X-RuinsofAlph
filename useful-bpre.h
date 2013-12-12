@@ -5,7 +5,7 @@ void updateEverything()
 	int (*func)(void) = (int (*)(void))0x080A910D;
 	func();
 
-	int (*func2)(void) = (int (*)(void))0x080069C1;
+	int (*func2)(void) = (int (*)(void))0x08006B5D; //call_back_oam
 	func2();
 	
 	int (*func3)(void) = (int (*)(void))0x08006A0D;
@@ -60,7 +60,7 @@ void copyMem(void *source, void *dest, void *size)
 
 void playFanfare(int *fanfareNum)
 {
-	int (*func)(void) = (int (*)(void))0x080A30E5; //TODO
+	int (*func)(void) = (int (*)(void))0x08071C61;
 	func();
 }
 
@@ -78,15 +78,20 @@ void changeIO(int *offset, int *value)
 
 void enableBG(int *BG)
 {
-	int (*func)(void) = (int (*)(void))0x08001B31;
+	int (*func)(void) = (int (*)(void))0x080019BD;
+	func();
+}
+
+void clearOAM()
+{
+	int (*func)(void) = (int (*)(void))0x08006975;
 	func();
 }
 
 //TODO figure out what the heck this is
 void initStuff()
 {
-	int (*func)(void) = (int (*)(void))0x08006975;
-	func();
+	clearOAM();
 	
 	int (*func2)(void) = (int (*)(void))0x0800870D;
 	func2();
@@ -108,16 +113,15 @@ void storeCallback2(int *addr)
 	func();
 }
 
-//Partial TODO
 u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 {
-	int (*func)(u32) = (int (*)(void))0x080084F9; //Problematic in question
+	int (*func)(u32) = (int (*)(void))0x080086DD; //load_gfx
 	func(addr); 
 	
 	int (*func2)(u32,u16,u16,u8) = (int (*)(u8))0x08006F8D;
 	u32 result = func2(addr2,XPos,YPos,0);
 	
-	result = (result*0x44) + 0x02020630;
+	result = (result*0x44) + 0x0202063D; //oam_pre_buffer
 	
 	return result;
 	
@@ -125,7 +129,7 @@ u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 
 void loadPalette(int *addr, int *offset, int *length)
 {
-	int (*func)(u32,u8,u8) = (int (*)(void))0x080A1939; //TODO
+	int (*func)(u32,u8,u8) = (int (*)(void))0x080703ED;
 	func(addr,offset,length);
 	
 }
