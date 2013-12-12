@@ -1,10 +1,10 @@
-The Ruins of Alph code by Mastermind_X released with permission under the GPLv3 licence, with some code from shinyquagsire23's FRCrystalIntro. It can be built using DevKitARM.
+The Ruins of Alph code by Mastermind_X released with permission under the GPLv3 licence. It can be built using DevKitARM.
 
 
 GPL Statement:
 --------------
 
-Copyright (C) 2013  Mastermind_X
+Copyright (C) 2013 Mastermind_X
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
