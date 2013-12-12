@@ -1,5 +1,5 @@
-#define objBaseAddr		 (u8  *) 0x02020630
-#define dummyAnimData	 (u32 *) 0x082EC6A8
+#define objBaseAddr		 (u8  *) 0x0202063C
+#define dummyAnimData	 (u32 *) 0x08231CFC
 #define dummyAnimRoutine (u32 *) 0x08007429
 
 #define LASTRESULT		(*(u16 *) 0x20375F0)
@@ -187,7 +187,7 @@ const u8 instsData[3] = {
 	0xF, 0x1, 0x2
 };
 
-void boxPrint(u8 slot, u8 font, u8 x, u8 y, u32 bar, u32 baz, u32 txtpointer)
+void boxPrint(u8 foo, u8 font, u8 x, u8 y, u32 bar, u32 baz, u32 txtpointer)
 {
 	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x0812E51D;
 	func3(foo,font,x,y,bar,baz,txtpointer);
