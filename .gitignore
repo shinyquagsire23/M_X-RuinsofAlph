@@ -1,7 +1,9 @@
 *.*~
-*.GBA
+*.gba
+*.sgm
 *.bak
 *.sa*
 *.bin
 *.elf
 *~
+main.bin
