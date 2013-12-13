@@ -11,12 +11,12 @@ typedef struct
 typedef struct
 {
 	u8 y, flags, x, msbXFlags;
-	u16 tileProPal, irrelivant;
-} Oam;
+	u16 tileProPal, irrelevant;
+} OAM;
 
 typedef struct
 {
-	Oam oam;
+	OAM oam;
 	u32 animation;
 	u8 fC, fD, fE, fF;
 	u32 f10, objectTemplate, f18, callback;
@@ -25,11 +25,11 @@ typedef struct
 	Position iPos, iVel;
 	u32 derp1, derp2;
 	u8 f42, f43, end;
-} OamThingy;
+} OAMThingy;
 
 typedef struct
 {
 	u16 f0, f1;
 	u32 oam, animation, gfx, animation2, callback;
 	u8 end;
-} ObjTemplate;
+} OBJTemplate;

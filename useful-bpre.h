@@ -1,5 +1,5 @@
 #define objBaseAddr		 (u8  *) 0x0202063C
-#define OAMBuffer ((OamThingy*)objBaseAddr)
+#define OAMBuffer		 ((OAMThingy*)objBaseAddr)
 #define dummyAnimData	 (u32 *) 0x08231CFC
 #define dummyAnimRoutine (u32 *) 0x0800760D
 
@@ -25,8 +25,8 @@
 #define var8004			(*(u16 *) 0x020370C0)
 #define fadeScreenDone	(*(u8  *) (0x02037AB8 + 7))
 #define globalVars		(*(u32 *) 0x0203BCD0)
-#define boxInitStuff 0x083E22C0
-#define nullCallback 0x08015B59
+#define boxInitStuff	0x083E22C0
+#define nullCallback	0x08015B59
 
 //RoA Sounds 
 #define EMPTYMOVESOUND  0x05 

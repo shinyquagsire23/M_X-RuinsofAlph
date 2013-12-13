@@ -1,7 +1,7 @@
 *.*~
 *.GBA
 *.bak
-*.sav
-*.sa1
+*.sa*
+*.bin
 *.elf
 *~
