@@ -84,7 +84,6 @@ void init3() {
 }
 
 void main() {					// The main loop
-storeCallback((void *) main + 1);
 	if (currentLoop == 0) {
 		currentTile = 0;
 		steps = 0;

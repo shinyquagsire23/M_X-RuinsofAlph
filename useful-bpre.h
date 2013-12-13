@@ -165,17 +165,17 @@ void initStuff()
 }
 
 //Unsure about this guy...
-void storeCallback2(int *addr)
-{
-	int (*func)(void) = (int (*)(void))0x080006F5;
-	func();
-}	
-
 void storeCallback(int *addr)
 {	
 	int (*func)(void) = (int (*)(void))0x08000545;
 	func();
 }
+
+void storeCallback2(int *addr)
+{
+	int (*func)(void) = (int (*)(void))0x080006F5;
+	func();
+}	
 
 u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
 {

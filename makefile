@@ -43,6 +43,7 @@ endif
 #Build for Emerald
 #
 bpee : 
+	sed 's/^        rom     : ORIGIN = 0x08XXXXXX, LENGTH = 32M$$/        rom     : ORIGIN = 0x08$(offset), LENGTH = 32M/' linker_base.lsc > linker.lsc
 	arm-none-eabi-gcc ${OPTS} -mthumb -mthumb-interwork -Dengine=1 -g -c -w -std=gnu99 -o main.out main.c
 	arm-none-eabi-ld -o main.o -T linker.lsc main.out
 	arm-none-eabi-objcopy -O binary main.o main.bin
