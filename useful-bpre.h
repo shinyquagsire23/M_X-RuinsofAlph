@@ -6,8 +6,6 @@
 //Memory Locations
 #define OAM_Mem 	       ((u16*)0x03003128)
 #define OBJ_PaletteMem        ((u16*)0x020373F8) // Sprite Palette(256/16 colors) (adjusted for FR callback)
-#define OAM_Data                 ((u16*)0x6010000) // Sprite data (bitmapped)
-#define FrontBuffer     ((u16*)0x6000000) // Front Display Memory (the screen in mode 3-5)
 #define BG_PaletteMem          ((u16*)0x020371F8) // Background Palette(256/16 colors) (adjusted for FR callback)
 #define BG_PaletteMem2          ((u16*)0x020375F8) // Background Palette(256/16
 #define OBJ_PaletteMem2        ((u16*)0x020377F8) // Sprite Palette(256/16 colors)

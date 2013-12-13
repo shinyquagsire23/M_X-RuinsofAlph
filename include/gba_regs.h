@@ -7,8 +7,8 @@
  
 #include "gba_types.h"
  
- // Sprites(128), coordinates, size..(total 1Kb) (adjusted for FR callback)
-
+#define OAM_Data                 ((u16*)0x6010000) // Sprite data (bitmapped)
+#define FrontBuffer     ((u16*)0x6000000) // Front Display Memory (the screen in mode 3-5)
 
 
 #define BG0CNT			*(u16*)0x4000008
