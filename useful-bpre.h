@@ -129,7 +129,7 @@ void playSound(int *fxNum)
 //TODO Actally call function
 u8 waitForSound() {
 
-	return 1;
+	return 0;
 	//int (*func)(void) = (int (*)(u8))0x080A38A1;
 	//return func();
 	
@@ -167,13 +167,13 @@ void initStuff()
 }
 
 //Unsure about this guy...
-void storeCallback(int *addr)
+void storeCallback2(int *addr)
 {
 	int (*func)(void) = (int (*)(void))0x080006F5;
 	func();
 }	
 
-void storeCallback2(int *addr)
+void storeCallback(int *addr)
 {	
 	int (*func)(void) = (int (*)(void))0x08000545;
 	func();
@@ -256,7 +256,7 @@ void someExitFunc()
 
 void forceNewBoxAndInitBG(u32 *addr)
 {
-	int (*func)(u32) = (int (*)(void))0x08003015;
+	int (*func)(u32) = (int (*)(void))0x08003B25;
 	func(addr);
 }
 
