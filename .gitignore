@@ -4,4 +4,5 @@
 *.sa*
 *.bin
 *.elf
+linker.lsc
 *~
