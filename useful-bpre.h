@@ -30,13 +30,13 @@
 #define boxInitStuff 0x083E22C0
 #define nullCallback 0x08015B59
 
-//RoA Sounds
-#define EMPTYMOVESOUND  0x05
-#define TILEMOVESOUND   0x23
-#define ERRORSOUND      0x20
-#define TAKETILESOUND   0x24
-#define DROPTILESOUND   0x2C
-#define WINSONG         0x186
+//RoA Sounds 
+#define EMPTYMOVESOUND  0x05 
+#define TILEMOVESOUND   0x1D 
+#define ERRORSOUND      0x1A 
+#define TAKETILESOUND   0x1E 
+#define DROPTILESOUND   0x26 
+#define WINSONG         0x10D 
 
 void updateEverything()
 {
