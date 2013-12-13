@@ -2,9 +2,12 @@ The Ruins of Alph Port
 --------------
 
 Original standalone program by Mastermind_X.
+
 Port to Pokémon Emerald by diegoisawesome and mwksoul.
+
 Port to Pokémon FireRed by shinyquagsire23 and diegoisawesome.
-Released with permission under the GPLv3 licence.
+
+Released under the GPLv3 licence.
 
 
 GPL Statement:
