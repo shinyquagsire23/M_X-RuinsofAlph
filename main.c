@@ -1,6 +1,10 @@
 #include "include/gba.h"
-#include "background.h"
-#include "tiles.h"
+#include "img_bins/background.h"
+#include "img_bins/pointer.h"
+#include "img_bins/tileset0-kabuto.h"
+#include "img_bins/tileset1-aerodactyl.h"
+#include "img_bins/tileset2-omanyte.h"
+#include "img_bins/tileset3-hooh.h"
 
 #define Tiles   ((u16 *) 0x6008000)
 #define MapData ((u16 *) 0x600E800)
@@ -187,9 +191,9 @@ void initBG() {
 	
 	loadTutorialText(tutorialText);
 	
-	loadPalette(background_Palette,0x0,0x20);		//unpack BG pal data
-	LZ77UnCompVram(background_Tiles, Tiles);		//unpack BG tile data
-	LZ77UnCompVram(background_Map,   MapData);		//unpack BG tilemap data
+	loadPalette(backgroundPal,0x0,0x20);		//unpack BG pal data
+	LZ77UnCompVram(backgroundTiles, Tiles);		//unpack BG tile data
+	LZ77UnCompVram(backgroundMap,   MapData);		//unpack BG tilemap data
 	
 }
 
@@ -282,15 +286,15 @@ void pointerAnimFunc(u8 *address) {
 void initTiles(u8 puzzleNumber) {
 
 	if(puzzleNumber == 0)
-		LZ77UnCompVram(tileset00_data, globalVars + 0x28);
+		LZ77UnCompVram(tileset0_kabutoTiles, globalVars + 0x28);
 	else if(puzzleNumber == 1)
-		LZ77UnCompVram(tileset01_data, globalVars + 0x28);
+		LZ77UnCompVram(tileset1_aerodactylTiles, globalVars + 0x28);
 	else if(puzzleNumber == 2)
-		LZ77UnCompVram(tileset02_data, globalVars + 0x28);
+		LZ77UnCompVram(tileset2_omanyteTiles, globalVars + 0x28);
 	else
-		LZ77UnCompVram(tileset03_data, globalVars + 0x28);
+		LZ77UnCompVram(tileset3_hoohTiles, globalVars + 0x28);
 	
-	LZ77UnCompVram(pointer_data, globalVars + 0x2028);
+	LZ77UnCompVram(pointerTiles, globalVars + 0x2028);
 	
 	const u32 pointerData[6] = {
 		0x00000000, OAMData1, OAMAnimTable1, 0x00000000,
@@ -302,7 +306,7 @@ void initTiles(u8 puzzleNumber) {
 	};
 
 	u32 tilePalData[2] = {
-		tiles_palette, 0x00000000
+		pointerPal, 0x00000000
 	};
 	
 	loadSpritePal(tilePalData);
