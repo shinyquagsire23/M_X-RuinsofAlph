@@ -129,7 +129,7 @@ void playSound(int *fxNum)
 //TODO Actally call function
 u8 waitForSound() {
 
-	return 1;
+	return 0;
 	//int (*func)(void) = (int (*)(u8))0x080A38A1;
 	//return func();
 	
@@ -167,13 +167,13 @@ void initStuff()
 }
 
 //Unsure about this guy...
-void storeCallback(int *addr)
+void storeCallback2(int *addr)
 {
 	int (*func)(void) = (int (*)(void))0x080006F5;
 	func();
 }	
 
-void storeCallback2(int *addr)
+void storeCallback(int *addr)
 {	
 	int (*func)(void) = (int (*)(void))0x08000545;
 	func();
@@ -227,7 +227,7 @@ void loadTutorialText(u32 *textAddr)
 	int (*func)(u8) = (int (*)(u32))0x08150409;		//load tutorial bar palette
 	loadPalette(func(2),0xB0,0x20);
 	drawTutorialBar(0x0,0xFF);
-	boxPrint(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
+	boxPrint(0x0,0x0,134,0x1,instsData,0x00000000,textAddr);
 	
 	int (*func4)(u8) = (int (*)(void))0x08003FA1;
 	func4(0x0); //Something with BGs
@@ -239,7 +239,7 @@ void loadTutorialText(u32 *textAddr)
 void reloadTutorialText(u32 *textAddr) 
 {
 	drawTutorialBar(0x0,0xFF);
-	boxPrint(0x0,0x0,0x2,0x1,instsData,0x00000000,textAddr);
+	boxPrint(0x0,0x0,134,0x1,instsData,0x00000000,textAddr);
 }
 
 void initMapData(u8 *r0, u32 *r1, u8 *r2)
@@ -256,7 +256,7 @@ void someExitFunc()
 
 void forceNewBoxAndInitBG(u32 *addr)
 {
-	int (*func)(u32) = (int (*)(void))0x08003015;
+	int (*func)(u32) = (int (*)(void))0x08003B25;
 	func(addr);
 }
 
