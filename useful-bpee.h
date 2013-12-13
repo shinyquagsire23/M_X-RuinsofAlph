@@ -1,5 +1,5 @@
 #define objBaseAddr		 (u8  *) 0x02020630
-#define OAMBuffer ((OamThingy*)objBaseAddr)
+#define OAMBuffer ((OAMThingy*)objBaseAddr)
 #define dummyAnimData	 (u32 *) 0x082EC6A8
 #define dummyAnimRoutine (u32 *) 0x08007429
 

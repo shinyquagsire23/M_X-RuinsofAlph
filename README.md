@@ -1,4 +1,13 @@
-The Ruins of Alph code by Mastermind_X released with permission under the GPLv3 licence. It can be built using DevKitARM.
+The Ruins of Alph Port
+--------------
+
+Original standalone program by Mastermind_X.
+
+Port to Pokémon Emerald by diegoisawesome and mwksoul.
+
+Port to Pokémon FireRed by shinyquagsire23 and diegoisawesome.
+
+Released under the GPLv3 licence.
 
 
 GPL Statement:
