@@ -84,7 +84,6 @@ void init3() {
 }
 
 void main() {					// The main loop
-storeCallback((void *) main + 1);
 	if (currentLoop == 0) {
 		currentTile = 0;
 		steps = 0;
@@ -363,7 +362,9 @@ void getKeyInput() {
 	if(keyPressed(KEY_RIGHT)) {
 		if (dataX < 5) {
 			if(carryFlag)
+			{
 				playSound(TILEMOVESOUND);
+			}
 			else {
 				objTimer(0) = 0;
 				playSound(EMPTYMOVESOUND);
@@ -385,7 +386,9 @@ void getKeyInput() {
 	} else if(keyPressed(KEY_LEFT)) {
 		if (dataX > 0) {
 			if(carryFlag)
+			{
 				playSound(TILEMOVESOUND);
+			}
 			else {
 				objTimer(0) = 0;
 				playSound(EMPTYMOVESOUND);
@@ -407,7 +410,9 @@ void getKeyInput() {
 	} else if(keyPressed(KEY_DOWN)) {
 		if (dataY < 4) {
 			if(carryFlag)
+			{
 				playSound(TILEMOVESOUND);
+			}
 			else {
 				objTimer(0) = 0;
 				playSound(EMPTYMOVESOUND);
@@ -429,7 +434,9 @@ void getKeyInput() {
 	} else if(keyPressed(KEY_UP)) {
 		if (dataY > 0) {
 			if(carryFlag)
+			{
 				playSound(TILEMOVESOUND);
+			}
 			else {
 				objTimer(0) = 0;
 				playSound(EMPTYMOVESOUND);
