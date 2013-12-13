@@ -464,19 +464,19 @@ void getKeyInput() {
 					currentTile = 0;
 					carryFlag = 0;
 					if(!Win()) {
-						reloadTutorialText(tutorialText);
+						reloadTutorialText(tutorialText, 0);
 						objPalTile(0) = PRIORITY(0);
 					}
 					else {
 						objVisible(0) = 0;
-						reloadTutorialText(tutorialText3);
+						reloadTutorialText(tutorialText3, 1);
 					}
 				} else
 					playSound(ERRORSOUND);
 			}
 			else {
 				if (tileConfig[dataY*6+dataX] != 0) {
-					reloadTutorialText(tutorialText2);
+					reloadTutorialText(tutorialText2, 0);
 					playSound(TAKETILESOUND);
 					currentTile = tileConfig[dataY*6+dataX];
 					tileConfig[dataY*6+dataX] = 0;

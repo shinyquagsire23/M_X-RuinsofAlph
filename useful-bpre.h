@@ -234,10 +234,10 @@ void loadTutorialText(u32 *textAddr)
 	
 }
 
-void reloadTutorialText(u32 *textAddr) 
+void reloadTutorialText(u32 *textAddr, int shortText) 
 {
 	drawTutorialBar(0x0,0xFF);
-	boxPrint(0x0,0x0,134,0x1,instsData,0x00000000,textAddr);
+	boxPrint(0x0,0x0,134 + (shortText == 1 ? 68 : 0),0x1,instsData,0x00000000,textAddr);
 }
 
 void initMapData(u8 *r0, u32 *r1, u8 *r2)
