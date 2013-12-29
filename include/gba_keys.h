@@ -17,5 +17,12 @@
 #define KEY_DOWN   0x80
 #define KEY_R      0x01
 #define KEY_L      0x02
+
+#define keyPressed(k)     (KEYS & k)
+#define keyHeldDown(k)    (KEYSHOLD & k)
+#define keyScrolling(k)   (KEYSSCROLL & k)
+#define keyPressedLR(k)   (KEYSLR & k)
+#define keyHeldDownLR(k)  (KEYSHOLDLR & k)
+#define keyScrollingLR(k) (KEYSSCROLLLR & k)
  
 #endif

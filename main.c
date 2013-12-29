@@ -363,7 +363,7 @@ void setTileGFobjXPos() {
 }
 
 void getKeyInput() {
-	if(keyPressed(KEY_RIGHT)) {
+	if(keyScrolling(KEY_RIGHT)) {
 		if (dataX < 5) {
 			if(carryFlag)
 			{
@@ -387,7 +387,7 @@ void getKeyInput() {
 				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
-	} else if(keyPressed(KEY_LEFT)) {
+	} else if(keyScrolling(KEY_LEFT)) {
 		if (dataX > 0) {
 			if(carryFlag)
 			{
@@ -411,7 +411,7 @@ void getKeyInput() {
 				objXPos(0) += coordsX[dataY*6+dataX];
 		}
 		
-	} else if(keyPressed(KEY_DOWN)) {
+	} else if(keyScrolling(KEY_DOWN)) {
 		if (dataY < 4) {
 			if(carryFlag)
 			{
@@ -435,7 +435,7 @@ void getKeyInput() {
 			objYPos(0) += coordsY[dataY*6+dataX];
 		}
 		
-	} else if(keyPressed(KEY_UP)) {
+	} else if(keyScrolling(KEY_UP)) {
 		if (dataY > 0) {
 			if(carryFlag)
 			{

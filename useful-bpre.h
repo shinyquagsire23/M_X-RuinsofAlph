@@ -4,21 +4,19 @@
 #define dummyAnimRoutine (u32 *) 0x0800760D
 
 //Memory Locations
-#define OAM_Mem 	       ((u16*)0x03003128)
+#define OAM_Mem 	          ((u16*)0x03003128)
 #define OBJ_PaletteMem        ((u16*)0x020373F8) // Sprite Palette(256/16 colors) (adjusted for FR callback)
-#define BG_PaletteMem          ((u16*)0x020371F8) // Background Palette(256/16 colors) (adjusted for FR callback)
-#define BG_PaletteMem2          ((u16*)0x020375F8) // Background Palette(256/16
-#define OBJ_PaletteMem2        ((u16*)0x020377F8) // Sprite Palette(256/16 colors)
+#define BG_PaletteMem         ((u16*)0x020371F8) // Background Palette(256/16 colors) (adjusted for FR callback)
+#define BG_PaletteMem2        ((u16*)0x020375F8) // Background Palette(256/16
+#define OBJ_PaletteMem2       ((u16*)0x020377F8) // Sprite Palette(256/16 colors)
 
 //Key Stuffs
-#define KEYS         *(volatile u8*)0x0300311E
-#define KEYSHOLD     *(volatile u8*)0x0300311C
-#define KEYSLR       *(volatile u8*)0x0300311F
-#define KEYSHOLDLR   *(volatile u8*)0x0300311D
-#define keyPressed(k)    (KEYS & k)
-#define keyHeldDown(k)   (KEYSHOLD & k)
-#define keyPressedLR(k)  (KEYSLR & k)
-#define keyHeldDownLR(k) (KEYSHOLDLR & k)
+#define KEYS            *(volatile u8*)0x0300311E
+#define KEYSHOLD        *(volatile u8*)0x0300311C
+#define KEYSSCROLL      *(volatile u8*)0x03003120
+#define KEYSLR          *(volatile u8*)0x0300311F
+#define KEYSHOLDLR      *(volatile u8*)0x0300311D
+#define KEYSSCROLLLR    *(volatile u8*)0x03003121
 
 //Variables and Such
 #define LASTRESULT		(*(u16 *) 0x020370D0)
