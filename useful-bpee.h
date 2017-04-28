@@ -106,7 +106,7 @@ void copyMem(void *source, void *dest, void *size)
 	SystemCall(0xC);
 }
 
-void playFanfare(int *fanfareNum)
+void playFanfare(int fanfareNum)
 {
 	int (*func)(u16) = (int (*)(void))0x080A30E5;
 	func(fanfareNum);
@@ -119,7 +119,7 @@ u8 waitForFanfare() {
 	
 }
 
-void playSound(int *soundNum)
+void playSound(int soundNum)
 {
 	int (*func)(u16) = (int (*)(void))0x080A37A5;
 	func(soundNum);

@@ -24,7 +24,7 @@
 #define fadeScreenDone	(*(u8  *) (0x02037AB8 + 7))
 #define globalVars		(*(u32 *) 0x0203BCD0)
 #define boxInitStuff	0x083E22C0
-#define nullCallback	0x08015B59
+#define nullCallback	0x080568E1
 
 //RoA Sounds 
 #define EMPTYMOVESOUND  0x05 
@@ -103,10 +103,10 @@ void copyMem(void *source, void *dest, void *size)
 	SystemCall(0xC);
 }
 
-void playFanfare(int *fanfareNum)
+void playFanfare(int fanfareNum)
 {
-	int (*func)(void) = (int (*)(void))0x08071C61;
-	func();
+	int (*func)(u16) = (int (*)(void))0x08071C61;
+	func(fanfareNum);
 }
 
 u8 waitForFanfare() {
@@ -116,10 +116,10 @@ u8 waitForFanfare() {
 	
 }
 
-void playSound(int *fxNum)
+void playSound(int fxNum)
 {
-	int (*func)(void) = (int (*)(void))0x080722CD;
-	func();
+	int (*func)(u16) = (int (*)(void))0x080722CD;
+	func(fxNum);
 }
 
 //TODO Actally call function
@@ -139,8 +139,8 @@ void changeIO(int *offset, int *value)
 
 void enableBG(int *BG)
 {
-	int (*func)(void) = (int (*)(void))0x080019BD;
-	func();
+	int (*func)(u8) = (int (*)(void))0x080019BD;
+	func(BG);
 }
 
 void clearOAM()
@@ -165,14 +165,14 @@ void initStuff()
 //Unsure about this guy...
 void storeCallback(int *addr)
 {	
-	int (*func)(void) = (int (*)(void))0x08000545;
-	func();
+	int (*func)(u32) = (int (*)(void))0x08000545;
+	func(addr);
 }
 
 void storeCallback2(int *addr)
 {
-	int (*func)(void) = (int (*)(void))0x080006F5;
-	func();
+	int (*func)(u32) = (int (*)(void))0x080006F5;
+	func(addr);
 }	
 
 u32 createSprite(int *addr, int *addr2, int *XPos, int *YPos, int *i)
@@ -229,7 +229,6 @@ void loadTutorialText(u32 *textAddr)
 	func4(0x0); //Something with BGs
 	
 	writeBoxesToTilemap(0x0,3);
-	
 }
 
 void reloadTutorialText(u32 *textAddr, int shortText) 
