@@ -13,9 +13,9 @@
 #define OBJData ((u16 *) 0x6010000)
 #define MenuBG  ((u16 *) 0x600F800)
 
-#define DMA3Source		(*(u32 *) 0x040000D4)
-#define DMA3Dest		(*(u32 *) 0x040000D8)
-#define DMA3Options		(*(u32 *) 0x040000DC)
+#define DMA3Source		(*(volatile u32 *) 0x040000D4)
+#define DMA3Dest		(*(volatile u32 *) 0x040000D8)
+#define DMA3Options		(*(volatile u32 *) 0x040000DC)
 
 #define objPalTile(tile) (*(u16 *) (objBaseAddr + 0x04 + (tile*0x44)))
 #define objXPos(tile)    (*(u16 *) (objBaseAddr + 0x20 + (tile*0x44)))
@@ -32,16 +32,19 @@
 #define currentLoop		(*(u8  *) (globalVars + 0x9))
 #define tileConfig		( (u8  *) (globalVars + 0xA))	// Size of 0x1E
 
+#define globalWinId     (*(u32 *) (globalVars + 0x2228))
 
 u16 Win();
 void init2();
 void init3();
 void main();
+u32 initBG();
 
 void init() {
 
-	storeCallback((void *) init2 + 1);
-	
+	storeCallback((void *) init2);
+	*(volatile u16 *)0x4000000 &= ~0x1F00;
+	changeIO(0, 0);
 }
 
 #include "include/gba_compress.h"
@@ -59,7 +62,7 @@ void init() {
 void init2() {
 
 	storeCallback2(0);
-	globalVars = malloc(0x2228);						//malloc 0x2228 bytes
+	globalVars = malloc(0x222c);						//malloc 0x222c bytes
 	
 	int blank = 0;
 	DMA3Source = &blank;
@@ -68,7 +71,7 @@ void init2() {
 	
 	currentLoop = 0;
 	
-	storeCallback((void *) init3 + 1);
+	storeCallback((void *) init3);
 	
 }
 
@@ -82,8 +85,7 @@ void init3() {
 	};
 	
 	initMapData(0x1,mapDataUnk,0x2);
-	
-	storeCallback((void *) main + 1);
+	storeCallback((void *) main);
 	
 }
 
@@ -96,25 +98,30 @@ void main() {					// The main loop
 		currentLoop = 0;
 		
 		initVideo();
-		initBG();
+		globalWinId = initBG();
 		initConfig(var8004);
 		initTiles(var8004);
 		setTileGFobjXPos();
 		
 		unfadeScreen();
 		currentLoop++;
-		storeCallback2((void *) updateEverything2 + 1);
+		storeCallback2((void *) updateEverything2);
 	
 	}
 	
 	else if (currentLoop == 1) {
-		if (fadeScreenDone == 0)
+		if (fadeScreenDone == 0) {
 			currentLoop++;
+			changeIO(0,OBJ_ENABLE|OBJ_MAP_1D|0xf00);
+			enableBG(0);
+			enableBG(1);
+			*(volatile u16 *)0x400000a |= 3;
+		}
 	}
 	
 	else if (currentLoop == 2) {
 		if (!Win()) {
-			getKeyInput();
+			getKeyInput(globalWinId);
 		}
 		
 		else {
@@ -153,7 +160,7 @@ void main() {					// The main loop
 
 void initVideo() {
 
-	changeIO(0,OBJ_ENABLE | OBJ_MAP_1D);
+	changeIO(0, OBJ_MAP_1D);
 	
 	u32 x = 0x80 << 5;
 	u32 endAddr = 0xC0 << 0x13;
@@ -166,9 +173,6 @@ void initVideo() {
 	}
 	
 	forceNewBoxAndInitBG(boxInitStuff);
-	
-	enableBG(0);
-	enableBG(1);
 	
 	changeIO(0x8,(0x1E << SCREEN_SHIFT));
 	changeIO(0xA,(0x1D << SCREEN_SHIFT) | (2 << CHAR_SHIFT) | 3);
@@ -187,14 +191,14 @@ const u8 tutorialText3[9] = {
 	0xF8, 0x00, 0xF8, 0x01, 0xBF, 0xD2, 0xC3, 0xCE, 0xFF //(A)(B)EXIT
 };
 
-void initBG() {
+u32 initBG() {
 	
-	loadTutorialText(tutorialText);
+	u32 winId = loadTutorialText(tutorialText);
 	
 	loadPalette(backgroundPal,0x0,0x20);		//unpack BG pal data
 	LZ77UnCompVram(backgroundTiles, Tiles);		//unpack BG tile data
 	LZ77UnCompVram(backgroundMap,   MapData);		//unpack BG tilemap data
-	
+	return winId;
 }
 
 void *memcpy(void *dest, const void *src, u32 n) {
@@ -282,18 +286,16 @@ void pointerAnimFunc(u8 *address) {
 		*(address + 0x3E) = *(address + 0x2E) & -5;
 	}
 }
+
+static const unsigned short *const objTilesets[] = {
+	tileset0_kabutoTiles,
+	tileset1_aerodactylTiles,
+	tileset2_omanyteTiles,
+	tileset3_hoohTiles,
+};
 	
 void initTiles(u8 puzzleNumber) {
-
-	if(puzzleNumber == 0)
-		LZ77UnCompVram(tileset0_kabutoTiles, globalVars + 0x28);
-	else if(puzzleNumber == 1)
-		LZ77UnCompVram(tileset1_aerodactylTiles, globalVars + 0x28);
-	else if(puzzleNumber == 2)
-		LZ77UnCompVram(tileset2_omanyteTiles, globalVars + 0x28);
-	else
-		LZ77UnCompVram(tileset3_hoohTiles, globalVars + 0x28);
-	
+	LZ77UnCompVram(objTilesets[puzzleNumber], globalVars + 0x28);
 	LZ77UnCompVram(pointerTiles, globalVars + 0x2028);
 	
 	const u32 pointerData[6] = {
@@ -362,7 +364,7 @@ void setTileGFobjXPos() {
 	}
 }
 
-void getKeyInput() {
+void getKeyInput(u32 winId) {
 	if(keyScrolling(KEY_RIGHT)) {
 		if (dataX < 5) {
 			if(carryFlag)
@@ -468,19 +470,19 @@ void getKeyInput() {
 					currentTile = 0;
 					carryFlag = 0;
 					if(!Win()) {
-						reloadTutorialText(tutorialText, 0);
+						reloadTutorialText(winId, tutorialText, 0);
 						objPalTile(0) = PRIORITY(0);
 					}
 					else {
 						objVisible(0) = 0;
-						reloadTutorialText(tutorialText3, 1);
+						reloadTutorialText(winId, tutorialText3, 1);
 					}
 				} else
 					playSound(ERRORSOUND);
 			}
 			else {
 				if (tileConfig[dataY*6+dataX] != 0) {
-					reloadTutorialText(tutorialText2, 0);
+					reloadTutorialText(winId, tutorialText2, 0);
 					playSound(TAKETILESOUND);
 					currentTile = tileConfig[dataY*6+dataX];
 					tileConfig[dataY*6+dataX] = 0;

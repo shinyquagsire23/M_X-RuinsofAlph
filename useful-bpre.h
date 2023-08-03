@@ -91,18 +91,6 @@ void fadeScreen2(int *bitmask, int *r1, int *r2, int *r3, int *color)
 		
 }
 
-void copyPal(void *source, void *dest)
-{
-	asm("mov r2, #0x8");
-	SystemCall(0xC);
-}
-
-void copyMem(void *source, void *dest, void *size)
-{
-	asm("mov r2, #0x8");
-	SystemCall(0xC);
-}
-
 void playFanfare(int fanfareNum)
 {
 	int (*func)(u16) = (int (*)(void))0x08071C61;
@@ -200,41 +188,56 @@ const u8 instsData[3] = {
 	0xF, 0x1, 0x2
 };
 
-void boxPrint(u8 foo, u8 font, u8 x, u8 y, u32 bar, u32 baz, u32 txtpointer)
+void boxPrint(u8 windowId, u8 font, u8 x, u8 y, u32 bar, u32 baz, u32 txtpointer)
 {
 	int (*func3)(u8,u8,u8,u8,u32,u32,u32) = (int (*)(void))0x0812E51D;
-	func3(foo,font,x,y,bar,baz,txtpointer);
+	func3(windowId,font,x,y,bar,baz,txtpointer);
 }
 
-void writeBoxesToTilemap(u8 a, u8 b)
+void writeBoxesToTilemap(u8 windowId, u8 mode)
 {
 	int (*func5)(u8,u8) = (int (*)(void))0x08003F21;
-	func5(a,b);
+	func5(windowId,mode);
 }
 
-void drawTutorialBar(u8 background, u8 type)
+void drawTutorialBar(u8 windowId, u8 value)
 {
 	int (*func2)(u8,u8) = (int (*)(void))0x0800445D;
-	func2(background,type);
+	func2(windowId,value);
 }
 
-void loadTutorialText(u32 *textAddr) 
+struct WindowTemplate
 {
+	u8 bg;
+	u8 tilemapLeft;
+	u8 tilemapTop;
+	u8 width;
+	u8 height;
+	u8 paletteNum;
+	u16 baseBlock;
+};
+
+u32 loadTutorialText(u32 *textAddr)
+{
+	const struct WindowTemplate templ = {0,0,0,30,2,11,0x226};
+	u16 (*AddWindow)(const struct WindowTemplate *) = (void *)0x8003ce5;
+	u8 windowId = AddWindow(&templ);
 	int (*func)(u8) = (int (*)(u32))0x08150409;		//load tutorial bar palette
 	loadPalette(func(2),0xB0,0x20);
-	drawTutorialBar(0x0,0xFF);
-	boxPrint(0x0,0x0,134,0x1,instsData,0x00000000,textAddr);
+	drawTutorialBar(windowId,0xFF);
+	boxPrint(windowId,0x0,134,0x1,instsData,0x00000000,textAddr);
 	
 	int (*func4)(u8) = (int (*)(void))0x08003FA1;
-	func4(0x0); //Something with BGs
+	func4(windowId); //Something with BGs
 	
-	writeBoxesToTilemap(0x0,3);
+	writeBoxesToTilemap(windowId,3);
+	return windowId;
 }
 
-void reloadTutorialText(u32 *textAddr, int shortText) 
+void reloadTutorialText(u32 windowId, u32 *textAddr, int shortText)
 {
-	drawTutorialBar(0x0,0xFF);
-	boxPrint(0x0,0x0,134 + (shortText == 1 ? 68 : 0),0x1,instsData,0x00000000,textAddr);
+	drawTutorialBar(windowId,0xFF);
+	boxPrint(windowId,0x0,134 + (shortText == 1 ? 68 : 0),0x1,instsData,0x00000000,textAddr);
 }
 
 void initMapData(u8 *r0, u32 *r1, u8 *r2)
